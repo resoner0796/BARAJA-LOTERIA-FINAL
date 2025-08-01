@@ -7,26 +7,20 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="icon" type="image/png" href="icon.png" />
   <style>
-    @font-face {
-      font-family: 'BernardMT';
-      src: url('BernardMT.ttf') format('truetype');
-    }
-
     body {
       margin: 0;
-      font-family: 'BernardMT', cursive;
-      background-image: url('fondo.jpg');
-      background-size: cover;
-      background-position: center;
+      font-family: 'Comic Sans MS', cursive;
+      color: #fff;
       text-align: center;
-      color: white;
+      background: url('fondo.jpg') no-repeat center center fixed;
+      background-size: cover;
     }
 
     #splash-screen {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background-color: #000;
+      background-color: #000000;
       z-index: 9999;
       display: flex;
       justify-content: center;
@@ -112,19 +106,15 @@ let intervalo = null;
 let index = 0;
 let tiempo = 4000;
 let primera = true;
-
-const nombres = [
-  "", "El gallo", "El diablito", "La dama", "El catrín", "El paraguas", "La sirena", "La escalera", "La botella",
-  "El barril", "El árbol", "El melón", "El valiente", "El gorrito", "La muerte", "La pera", "La bandera",
-  "El bandolón", "El violoncello", "La garza", "El pájaro", "La mano", "La bota", "La luna", "El cotorro",
-  "El borracho", "El negrito", "El corazón", "La sandía", "El tambor", "El camarón", "Las jaras", "El músico",
-  "La araña", "El soldado", "La estrella", "El cazo", "El mundo", "El apache", "El nopal", "El alacrán", "La rosa",
-  "La calavera", "La campana", "El cantarito", "El venado", "El sol", "La corona", "La chalupa", "El pino",
-  "El pescado", "La palma", "La maceta", "El arpa", "La rana"
-];
+let audiosPrecargados = {};
 
 function actualizarIntervalo() {
   tiempo = parseInt(document.getElementById("intervalo").value);
+}
+
+function reproducirSonido(nombreArchivo) {
+  const audio = new Audio(nombreArchivo);
+  audio.play().catch(err => console.error("Audio error:", err));
 }
 
 function barajear() {
@@ -135,11 +125,22 @@ function barajear() {
   document.getElementById("historial").innerHTML = "";
   detenerJuego();
   reproducirSonido("barajar.mp3");
+
+  // Preload audios
+  for (let i = 1; i <= 54; i++) {
+    const num = String(i).padStart(2, '0');
+    audiosPrecargados[num] = new Audio(`audios/${num}.mp3`);
+  }
 }
 
 function iniciarJuego() {
   if (!mezcladas.length) barajear();
   reproducirSonido("campana.mp3");
+
+  if (primera) {
+    reproducirSonido("corre.mp3");
+  }
+
   intervalo = setInterval(() => {
     if (index < mezcladas.length) {
       mostrarCarta(mezcladas[index]);
@@ -155,25 +156,18 @@ function detenerJuego() {
 }
 
 function mostrarCarta(numero) {
-  const nombre = nombres[numero];
-  const imagen = `img/${String(numero).padStart(2, '0')}.png`;
+  const nombre = numero.toString().padStart(2, '0');
+  const imagen = `img/${nombre}.png`;
   document.getElementById("cartaActual").innerHTML = `<div>${nombre}</div><img src="${imagen}" alt="${nombre}">`;
   document.getElementById("historial").innerHTML += `<img src="${imagen}" alt="${nombre}">`;
 
-  if (primera) {
-    reproducirSonido("audios/corre.mp3");
-    setTimeout(() => {
-      reproducirSonido(`audios/${String(numero).padStart(2, '0')}.mp3`);
-    }, 1200);
-    primera = false;
-  } else {
-    reproducirSonido(`audios/${String(numero).padStart(2, '0')}.mp3`);
+  // Reproduce audio
+  if (audiosPrecargados[nombre]) {
+    audiosPrecargados[nombre].currentTime = 0;
+    audiosPrecargados[nombre].play().catch(err => console.error("Error audio carta:", err));
   }
-}
 
-function reproducirSonido(nombreArchivo) {
-  const audio = new Audio(nombreArchivo);
-  audio.play();
+  primera = false;
 }
 </script>
 
