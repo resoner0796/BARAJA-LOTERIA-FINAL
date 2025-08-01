@@ -8,19 +8,20 @@
   <link rel="icon" type="image/png" href="icon.png" />
   <style>
     @font-face {
-      font-family: 'BernardMT';
+      font-family: 'Bernard MT';
       src: url('BernardMT.ttf') format('truetype');
       font-weight: bold;
     }
+
     body {
       margin: 0;
-      font-family: 'BernardMT', cursive;
-      background-image: url('fondo.jpg');
+      font-family: 'Bernard MT', cursive;
+      background: url('fondo.jpg') no-repeat center center fixed;
       background-size: cover;
-      background-position: center;
       text-align: center;
-      color: #333;
+      color: white;
     }
+
     #splash-screen {
       position: fixed;
       top: 0; left: 0;
@@ -75,7 +76,7 @@
   <img src="splash.png" alt="Cargando..." />
 </div>
 
-<h1>🎴 Lotería Mexicana</h1>
+<h1 style="text-shadow: 2px 2px 4px black">🎴 Lotería Mexicana</h1>
 
 <div id="controls">
   <button class="btn" onclick="barajear()">🎲 Barajear</button>
@@ -97,6 +98,8 @@
 window.addEventListener("load", () => {
   setTimeout(() => document.getElementById("splash-screen").style.display = "none", 2500);
 });
+
+speechSynthesis.onvoiceschanged = () => {}; // Forzar carga de voces en iPhone
 
 let barajas = Array.from({ length: 54 }, (_, i) => i + 1);
 let mezcladas = [];
@@ -146,18 +149,22 @@ function detenerJuego() {
   clearInterval(intervalo);
 }
 
+function hablar(texto) {
+  const u = new SpeechSynthesisUtterance(texto);
+  const voces = speechSynthesis.getVoices();
+  const voz = voces.find(v => v.lang === 'es-MX') || voces.find(v => v.lang.startsWith('es')) || voces[0];
+  if (voz) u.voice = voz;
+  speechSynthesis.speak(u);
+}
+
 function mostrarCarta(numero) {
   const nombre = nombres[numero];
   const imagen = `img/${String(numero).padStart(2, '0')}.png`;
-  document.getElementById("cartaActual").innerHTML = `<div>${nombre}</div><img src="${imagen}" alt="${nombre}">`;
+  document.getElementById("cartaActual").innerHTML = `<div style="text-shadow: 2px 2px 4px black">${nombre}</div><img src="${imagen}" alt="${nombre}">`;
   document.getElementById("historial").innerHTML += `<img src="${imagen}" alt="${nombre}">`;
-
   let texto = primera ? "Corre y se va con " + nombre : nombre;
   primera = false;
-
-  const u = new SpeechSynthesisUtterance(texto);
-  u.lang = 'es-MX';
-  speechSynthesis.speak(u);
+  hablar(texto);
 }
 
 function reproducirSonido(nombreArchivo) {
