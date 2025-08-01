@@ -10,28 +10,25 @@
     body {
       margin: 0;
       font-family: 'Comic Sans MS', cursive;
-      color: #fff;
-      text-align: center;
       background: url('fondo.jpg') no-repeat center center fixed;
       background-size: cover;
+      text-align: center;
+      color: #fff;
     }
-
     #splash-screen {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background-color: #000000;
+      background-color: #000;
       z-index: 9999;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
     }
-
     #splash-screen img {
       max-width: 80%;
     }
-
     .btn {
       padding: 1rem 2rem;
       font-size: 1.2rem;
@@ -43,16 +40,13 @@
       cursor: pointer;
       box-shadow: 0 3px 5px rgba(0,0,0,0.2);
     }
-
     #controls, #cartaActual, #historial {
       margin-top: 2rem;
     }
-
     #cartaActual img {
       width: 200px;
       margin-top: 1rem;
     }
-
     #historial {
       max-width: 100%;
       display: flex;
@@ -60,11 +54,9 @@
       justify-content: center;
       gap: 10px;
     }
-
     #historial img {
       width: 60px;
     }
-
     label {
       font-weight: bold;
       margin-top: 1rem;
@@ -77,12 +69,13 @@
   <img src="splash.png" alt="Cargando..." />
 </div>
 
-<h1>🎴 Lotería Mexicana</h1>
+<h1 style="text-shadow: 2px 2px 4px #000;">🎴 Lotería Mexicana</h1>
 
 <div id="controls">
   <button class="btn" onclick="barajear()">🎲 Barajear</button>
   <button class="btn" onclick="iniciarJuego()">🔔 Iniciar Juego</button>
-  <button class="btn" onclick="detenerJuego()">✋ Detener Juego</button><br>
+  <button class="btn" onclick="detenerJuego()">✋ Detener Juego</button>
+  <button class="btn" onclick="siguienteCarta()">➡️ Siguiente</button><br>
   <label for="intervalo">Segundos entre cartas:</label>
   <select id="intervalo" onchange="actualizarIntervalo()">
     <option value="2000">2 segundos</option>
@@ -97,6 +90,8 @@
 
 <script>
 window.addEventListener("load", () => {
+  const unlock = new Audio(); // para desbloquear audio en iOS
+  unlock.play().catch(() => {});
   setTimeout(() => document.getElementById("splash-screen").style.display = "none", 2500);
 });
 
@@ -106,41 +101,37 @@ let intervalo = null;
 let index = 0;
 let tiempo = 4000;
 let primera = true;
-let audiosPrecargados = {};
+let modoManual = false;
+
+const nombres = [
+  "", "el_gallo", "el_diablito", "la_dama", "el_catrin", "el_paraguas", "la_sirena", "la_escalera", "la_botella",
+  "el_barril", "el_arbol", "el_melon", "el_valiente", "el_gorrito", "la_muerte", "la_pera", "la_bandera",
+  "el_bandolon", "el_violoncello", "la_garza", "el_pajaro", "la_mano", "la_bota", "la_luna", "el_cotorro",
+  "el_borracho", "el_negrito", "el_corazon", "la_sandia", "el_tambor", "el_camaron", "las_jaras", "el_musico",
+  "la_arana", "el_soldado", "la_estrella", "el_cazo", "el_mundo", "el_apache", "el_nopal", "el_alacran", "la_rosa",
+  "la_calavera", "la_campana", "el_cantarito", "el_venado", "el_sol", "la_corona", "la_chalupa", "el_pino",
+  "el_pescado", "la_palma", "la_maceta", "el_arpa", "la_rana"
+];
 
 function actualizarIntervalo() {
   tiempo = parseInt(document.getElementById("intervalo").value);
-}
-
-function reproducirSonido(nombreArchivo) {
-  const audio = new Audio(nombreArchivo);
-  audio.play().catch(err => console.error("Audio error:", err));
 }
 
 function barajear() {
   mezcladas = [...barajas].sort(() => Math.random() - 0.5);
   index = 0;
   primera = true;
+  detenerJuego();
   document.getElementById("cartaActual").innerHTML = "";
   document.getElementById("historial").innerHTML = "";
-  detenerJuego();
   reproducirSonido("barajar.mp3");
-
-  // Preload audios
-  for (let i = 1; i <= 54; i++) {
-    const num = String(i).padStart(2, '0');
-    audiosPrecargados[num] = new Audio(`audios/${num}.mp3`);
-  }
 }
 
 function iniciarJuego() {
   if (!mezcladas.length) barajear();
   reproducirSonido("campana.mp3");
-
-  if (primera) {
-    reproducirSonido("corre.mp3");
-  }
-
+  reproducirSonido("audios/corre.mp3");
+  modoManual = false;
   intervalo = setInterval(() => {
     if (index < mezcladas.length) {
       mostrarCarta(mezcladas[index]);
@@ -155,19 +146,29 @@ function detenerJuego() {
   clearInterval(intervalo);
 }
 
-function mostrarCarta(numero) {
-  const nombre = numero.toString().padStart(2, '0');
-  const imagen = `img/${nombre}.png`;
-  document.getElementById("cartaActual").innerHTML = `<div>${nombre}</div><img src="${imagen}" alt="${nombre}">`;
-  document.getElementById("historial").innerHTML += `<img src="${imagen}" alt="${nombre}">`;
-
-  // Reproduce audio
-  if (audiosPrecargados[nombre]) {
-    audiosPrecargados[nombre].currentTime = 0;
-    audiosPrecargados[nombre].play().catch(err => console.error("Error audio carta:", err));
+function siguienteCarta() {
+  if (!mezcladas.length) barajear();
+  if (index === 0) {
+    reproducirSonido("campana.mp3");
+    reproducirSonido("audios/corre.mp3");
   }
+  if (index < mezcladas.length) {
+    mostrarCarta(mezcladas[index]);
+    index++;
+  }
+}
 
-  primera = false;
+function mostrarCarta(numero) {
+  const nombre = nombres[numero];
+  const imagen = `img/${String(numero).padStart(2, '0')}.png`;
+  document.getElementById("cartaActual").innerHTML = `<div style="text-shadow:1px 1px 3px #000">${nombre.replace(/_/g, ' ')}</div><img src="${imagen}" alt="${nombre}">`;
+  document.getElementById("historial").innerHTML += `<img src="${imagen}" alt="${nombre}">`;
+  reproducirSonido(`audios/${String(numero).padStart(2, '0')}.mp3`);
+}
+
+function reproducirSonido(ruta) {
+  const audio = new Audio(ruta);
+  audio.play().catch(err => console.log("Audio bloqueado:", err));
 }
 </script>
 
