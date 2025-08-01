@@ -150,7 +150,6 @@ function detenerJuego() {
 function siguienteCarta() {
   if (!mezcladas.length) barajear();
   if (index === 0) {
-    reproducirSonido("campana.mp3");
     reproducirSonido("audios/corre.mp3");
   }
   if (index < mezcladas.length) {
