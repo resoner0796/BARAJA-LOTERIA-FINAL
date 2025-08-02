@@ -17,7 +17,9 @@
       font-family: 'BernardMT', cursive;
       background-image: url('fondo.jpg');
       background-size: cover;
-      background-position: center;
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-attachment: fixed;
       text-align: center;
       color: #fff;
       text-transform: uppercase;
@@ -98,7 +100,7 @@
   <button class="btn" onclick="barajear()">🎲 BARAJEAR</button>
   <button class="btn" onclick="iniciarJuego()">🔔 INICIAR JUEGO</button>
   <button class="btn" onclick="siguienteCarta()">➡️ SIGUIENTE</button>
-  <button class="btn" onclick="detenerJuego()">✋ DETENER JUEGO</button><br>
+  <button class="btn" onclick="detenerJuego(true)">✋ DETENER JUEGO</button><br>
   <label for="intervalo">SEGUNDOS ENTRE CARTAS:</label>
   <select id="intervalo" onchange="actualizarIntervalo()">
     <option value="2000">2 SEGUNDOS</option>
@@ -133,7 +135,7 @@ function barajear() {
   primera = true;
   document.getElementById("cartaActual").innerHTML = "";
   document.getElementById("historial").innerHTML = "";
-  detenerJuego();
+  detenerJuego(false); // No reproducir aplausos
   reproducirSonido("barajar.mp3");
 }
 
@@ -146,9 +148,11 @@ function iniciarJuego() {
   }, tiempo);
 }
 
-function detenerJuego() {
+function detenerJuego(reproducirAplausos = false) {
   clearInterval(intervalo);
-  reproducirSonido("aplausos.mp3");
+  if (reproducirAplausos) {
+    reproducirSonido("aplausos.mp3");
+  }
 }
 
 function siguienteCarta() {
@@ -156,7 +160,7 @@ function siguienteCarta() {
     mostrarCarta(mezcladas[index]);
     index++;
   } else {
-    detenerJuego();
+    detenerJuego(true);
   }
 }
 
