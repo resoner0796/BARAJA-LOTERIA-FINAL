@@ -3,33 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lotería Mexicana</title>
+  <title>LOTERÍA MEXICANA</title>
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="icon" type="image/png" href="icon.png" />
   <style>
+    @font-face {
+      font-family: 'BernardMT';
+      src: url('BernardMT.ttf');
+    }
+
     body {
       margin: 0;
-      font-family: 'BernardMT', sans-serif;
-font-weight: bold;
-      background: url('fondo.jpg') no-repeat center center fixed;
+      font-family: 'BernardMT', cursive;
+      background-image: url('fondo.jpg');
       background-size: cover;
+      background-position: center;
       text-align: center;
       color: #fff;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 2px black;
     }
+
     #splash-screen {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background-color: #000;
+      background-color: #000000;
       z-index: 9999;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
     }
+
     #splash-screen img {
       max-width: 80%;
     }
+
     .btn {
       padding: 1rem 2rem;
       font-size: 1.2rem;
@@ -41,26 +51,38 @@ font-weight: bold;
       cursor: pointer;
       box-shadow: 0 3px 5px rgba(0,0,0,0.2);
     }
+
     #controls, #cartaActual, #historial {
       margin-top: 2rem;
     }
+
     #cartaActual img {
       width: 200px;
       margin-top: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 30px 10px gold;
+      transition: all 0.4s ease-in-out;
     }
+
     #historial {
       max-width: 100%;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 10px;
+      margin-top: 20px;
     }
+
     #historial img {
       width: 60px;
+      border-radius: 5px;
     }
+
     label {
       font-weight: bold;
       margin-top: 1rem;
+      color: white;
+      text-shadow: 1px 1px 2px black;
     }
   </style>
 </head>
@@ -70,19 +92,19 @@ font-weight: bold;
   <img src="splash.png" alt="Cargando..." />
 </div>
 
-<h1 style="text-shadow: 2px 2px 4px #000;">🎴 Lotería Mexicana</h1>
+<h1>🎴 LOTERÍA MEXICANA</h1>
 
 <div id="controls">
-  <button class="btn" onclick="barajear()">🎲 Barajear</button>
-  <button class="btn" onclick="iniciarJuego()">🔔 Iniciar Juego</button>
-  <button class="btn" onclick="detenerJuego()">✋ Detener Juego</button>
-  <button class="btn" onclick="siguienteCarta()">➡️ Siguiente</button><br>
-  <label for="intervalo">Segundos entre cartas:</label>
+  <button class="btn" onclick="barajear()">🎲 BARAJEAR</button>
+  <button class="btn" onclick="iniciarJuego()">🔔 INICIAR JUEGO</button>
+  <button class="btn" onclick="siguienteCarta()">➡️ SIGUIENTE</button>
+  <button class="btn" onclick="detenerJuego()">✋ DETENER JUEGO</button><br>
+  <label for="intervalo">SEGUNDOS ENTRE CARTAS:</label>
   <select id="intervalo" onchange="actualizarIntervalo()">
-    <option value="2000">2 segundos</option>
-    <option value="3000">3 segundos</option>
-    <option value="4000" selected>4 segundos</option>
-    <option value="5000">5 segundos</option>
+    <option value="2000">2 SEGUNDOS</option>
+    <option value="3000">3 SEGUNDOS</option>
+    <option value="4000" selected>4 SEGUNDOS</option>
+    <option value="5000">5 SEGUNDOS</option>
   </select>
 </div>
 
@@ -91,8 +113,6 @@ font-weight: bold;
 
 <script>
 window.addEventListener("load", () => {
-  const unlock = new Audio(); // para desbloquear audio en iOS
-  unlock.play().catch(() => {});
   setTimeout(() => document.getElementById("splash-screen").style.display = "none", 2500);
 });
 
@@ -102,17 +122,6 @@ let intervalo = null;
 let index = 0;
 let tiempo = 4000;
 let primera = true;
-let modoManual = false;
-
-const nombres = [
-  "", "el_gallo", "el_diablito", "la_dama", "el_catrin", "el_paraguas", "la_sirena", "la_escalera", "la_botella",
-  "el_barril", "el_arbol", "el_melon", "el_valiente", "el_gorrito", "la_muerte", "la_pera", "la_bandera",
-  "el_bandolon", "el_violoncello", "la_garza", "el_pajaro", "la_mano", "la_bota", "la_luna", "el_cotorro",
-  "el_borracho", "el_negrito", "el_corazon", "la_sandia", "el_tambor", "el_camaron", "las_jaras", "el_musico",
-  "la_arana", "el_soldado", "la_estrella", "el_cazo", "el_mundo", "el_apache", "el_nopal", "el_alacran", "la_rosa",
-  "la_calavera", "la_campana", "el_cantarito", "el_venado", "el_sol", "la_corona", "la_chalupa", "el_pino",
-  "el_pescado", "la_palma", "la_maceta", "el_arpa", "la_rana"
-];
 
 function actualizarIntervalo() {
   tiempo = parseInt(document.getElementById("intervalo").value);
@@ -122,9 +131,9 @@ function barajear() {
   mezcladas = [...barajas].sort(() => Math.random() - 0.5);
   index = 0;
   primera = true;
-  detenerJuego();
   document.getElementById("cartaActual").innerHTML = "";
   document.getElementById("historial").innerHTML = "";
+  detenerJuego();
   reproducirSonido("barajar.mp3");
 }
 
@@ -132,43 +141,39 @@ function iniciarJuego() {
   if (!mezcladas.length) barajear();
   reproducirSonido("campana.mp3");
   reproducirSonido("audios/corre.mp3");
-  modoManual = false;
   intervalo = setInterval(() => {
-    if (index < mezcladas.length) {
-      mostrarCarta(mezcladas[index]);
-      index++;
-    } else {
-      detenerJuego();
-    }
+    siguienteCarta();
   }, tiempo);
 }
 
 function detenerJuego() {
   clearInterval(intervalo);
+  reproducirSonido("aplausos.mp3");
 }
 
 function siguienteCarta() {
-  if (!mezcladas.length) barajear();
-  if (index === 0) {
-    reproducirSonido("audios/corre.mp3");
-  }
   if (index < mezcladas.length) {
     mostrarCarta(mezcladas[index]);
     index++;
+  } else {
+    detenerJuego();
   }
 }
 
 function mostrarCarta(numero) {
-  const nombre = nombres[numero];
-  const imagen = `img/${String(numero).padStart(2, '0')}.png`;
-  document.getElementById("cartaActual").innerHTML = `<div style="text-shadow:1px 1px 3px #000">${nombre.replace(/_/g, ' ')}</div><img src="${imagen}" alt="${nombre}">`;
-  document.getElementById("historial").innerHTML += `<img src="${imagen}" alt="${nombre}">`;
-  reproducirSonido(`audios/${String(numero).padStart(2, '0')}.mp3`);
+  const nombre = String(numero).padStart(2, '0');
+  const audioPath = `audios/${nombre}.mp3`;
+  const imagen = `img/${nombre}.png`;
+
+  document.getElementById("cartaActual").innerHTML = `<img src="${imagen}" alt="Carta ${nombre}">`;
+  document.getElementById("historial").innerHTML += `<img src="${imagen}" alt="Carta ${nombre}">`;
+
+  reproducirSonido(audioPath);
 }
 
 function reproducirSonido(ruta) {
   const audio = new Audio(ruta);
-  audio.play().catch(err => console.log("Audio bloqueado:", err));
+  audio.play().catch(e => console.log("Error al reproducir:", e));
 }
 </script>
 
