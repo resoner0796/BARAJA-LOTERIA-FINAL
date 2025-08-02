@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lotería Mexicana</title>
   <link rel="icon" type="image/png" href="icon.png" />
-  <style>
+  <link rel="manifest" href="manifest.json">  <style>
     @font-face {
       font-family: 'BernardMT';
       src: url('BernardMT.ttf') format('truetype');
@@ -242,6 +242,16 @@ function lanzarConfeti() {
     origin: { y: 0.6 }
   });
 }
+</script>
+  
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service Worker registrado:', reg.scope))
+        .catch(err => console.error('Error al registrar Service Worker:', err));
+    });
+  }
 </script>
 
 </body>
