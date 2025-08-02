@@ -1,0 +1,21 @@
+{
+  "name": "Lotería Mexicana",
+  "short_name": "Lotería",
+  "description": "Baraja de Lotería Mexicana para jugar en familia",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffefd5",
+  "theme_color": "#e60000",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
