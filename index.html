@@ -1,39 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lotería Mexicana</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LOTERÍA MEXICANA</title>
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="icon" type="image/png" href="icon.png" />
   <style>
     @font-face {
       font-family: 'BernardMT';
-      src: url('BernardMT.ttf') format('truetype');
-      font-weight: bold;
+      src: url('BernardMT.ttf');
     }
+
     body {
       margin: 0;
       font-family: 'BernardMT', sans-serif;
-      background: url('fondo.jpg') no-repeat center center fixed;
+      background-image: url('fondo.jpg');
       background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
       text-align: center;
-      color: white;
+      color: #fff;
+      text-transform: uppercase;
     }
+
     #splash-screen {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background-color: #000000;
+      background-color: #000;
       z-index: 9999;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
     }
+
     #splash-screen img {
       max-width: 80%;
     }
+
     .btn {
       padding: 1rem 2rem;
       font-size: 1.2rem;
@@ -45,166 +51,203 @@
       cursor: pointer;
       box-shadow: 0 3px 5px rgba(0,0,0,0.2);
     }
-    #controls {
-      margin-top: 2rem;
+
+    #controls, #cartaActual, #historial {
+      margin-top: 1.5rem;
     }
-    #status-bar {
-      display: flex;
-      justify-content: space-between;
-      padding: 0 1rem;
-      margin-top: 1rem;
-      font-size: 1.2rem;
-    }
-    #juego {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 2rem;
-      margin-top: 2rem;
-      flex-wrap: wrap;
-    }
+
     #cartaActual img {
-      width: 200px;
+      width: 220px;
+      margin-top: 1rem;
       border: 5px solid gold;
-      box-shadow: 0 0 20px yellow;
-      border-radius: 10px;
+      border-radius: 15px;
     }
+
     #historial {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background: rgba(0,0,0,0.5);
+      max-width: 100%;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 10px;
-      padding: 10px 0;
+      gap: 8px;
+      margin-top: 20px;
     }
+
     #historial img {
-      width: 50px;
+      width: 60px;
     }
+
     label {
       font-weight: bold;
-      margin-top: 1rem;
     }
-    canvas.confetti {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9998;
+
+    #contador {
+      display: flex;
+      justify-content: space-around;
+      margin: 1rem 2rem;
+      font-size: 1.1rem;
+    }
+
+    /* Transición entre cartas */
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
     }
   </style>
 </head>
 <body>
-<canvas class="confetti"></canvas>
+
 <div id="splash-screen">
   <img src="splash.png" alt="Cargando..." />
 </div>
 
 <h1>🎴 LOTERÍA MEXICANA</h1>
-<div id="status-bar">
-  <div>🔢 Cantadas: <span id="cantadas">0</span> | Faltantes: <span id="faltantes">54</span></div>
-  <div>🧩 Partidas: <span id="partidas">0</span></div>
-</div>
 
 <div id="controls">
   <button class="btn" onclick="barajear()">🎲 BARAJEAR</button>
   <button class="btn" onclick="iniciarJuego()">🔔 INICIAR JUEGO</button>
   <button class="btn" onclick="siguienteCarta()">➡️ SIGUIENTE</button>
   <button class="btn" onclick="detenerJuego()">✋ DETENER JUEGO</button><br>
-  <label for="intervalo">⏱️ Segundos entre cartas:</label>
+  <label for="intervalo">TIEMPO ENTRE CARTAS:</label>
   <select id="intervalo" onchange="actualizarIntervalo()">
-    <option value="2000">2</option>
-    <option value="3000">3</option>
-    <option value="4000" selected>4</option>
-    <option value="5000">5</option>
+    <option value="2000">2 SEGUNDOS</option>
+    <option value="3000">3 SEGUNDOS</option>
+    <option value="4000" selected>4 SEGUNDOS</option>
+    <option value="5000">5 SEGUNDOS</option>
   </select>
 </div>
 
-<div id="juego">
-  <div id="cartaActual"></div>
+<div id="contador">
+  <div>CANTADAS: <span id="contadorCartas">0</span></div>
+  <div>FALTANTES: <span id="faltantes">54</span></div>
+  <div>PARTIDAS: <span id="partidas">0</span></div>
 </div>
+
+<div id="cartaActual"></div>
 <div id="historial"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
-let barajas = Array.from({ length: 54 }, (_, i) => i + 1);
-let mezcladas = [];
-let intervalo = null;
-let index = 0;
-let tiempo = 4000;
-let primera = true;
-let partidas = 0;
+  window.addEventListener("load", () => {
+    setTimeout(() => document.getElementById("splash-screen").style.display = "none", 2000);
+  });
 
-function actualizarIntervalo() {
-  tiempo = parseInt(document.getElementById("intervalo").value);
-}
+  let barajas = Array.from({ length: 54 }, (_, i) => i + 1);
+  let mezcladas = [];
+  let intervalo = null;
+  let index = 0;
+  let tiempo = 4000;
+  let primera = true;
+  let partidas = 0;
 
-function barajear() {
-  mezcladas = [...barajas].sort(() => Math.random() - 0.5);
-  index = 0;
-  primera = true;
-  partidas++;
-  document.getElementById("cantadas").textContent = 0;
-  document.getElementById("faltantes").textContent = 54;
-  document.getElementById("partidas").textContent = partidas;
-  document.getElementById("cartaActual").innerHTML = "";
-  document.getElementById("historial").innerHTML = "";
-  detenerJuego();
-  reproducirSonido("barajar.mp3");
-}
+  const nombres = [
+    "", "El Gallo", "El Diablito", "La Dama", "El Catrín", "El Paraguas", "La Sirena", "La Escalera", "La Botella",
+    "El Barril", "El Árbol", "El Melón", "El Valiente", "El Gorrito", "La Muerte", "La Pera", "La Bandera",
+    "El Bandolón", "El Violoncello", "La Garza", "El Pájaro", "La Mano", "La Bota", "La Luna", "El Cotorro",
+    "El Borracho", "El Negrito", "El Corazón", "La Sandía", "El Tambor", "El Camarón", "Las Jaras", "El Músico",
+    "La Araña", "El Soldado", "La Estrella", "El Cazo", "El Mundo", "El Apache", "El Nopal", "El Alacrán", "La Rosa",
+    "La Calavera", "La Campana", "El Cantarito", "El Venado", "El Sol", "La Corona", "La Chalupa", "El Pino",
+    "El Pescado", "La Palma", "La Maceta", "El Arpa", "La Rana"
+  ];
 
-function iniciarJuego() {
-  if (!mezcladas.length) barajear();
-  reproducirSonido("campana.mp3");
-  reproducirSonido("audios/corre.mp3");
-  intervalo = setInterval(() => {
+  function actualizarIntervalo() {
+    tiempo = parseInt(document.getElementById("intervalo").value);
+  }
+
+  function barajear() {
+    mezcladas = [...barajas].sort(() => Math.random() - 0.5);
+    index = 0;
+    primera = true;
+    document.getElementById("cartaActual").innerHTML = "";
+    document.getElementById("historial").innerHTML = "";
+
+    document.getElementById("contadorCartas").textContent = "0";
+    document.getElementById("faltantes").textContent = "54";
+
+    detenerJuego();
+
+    reproducirSonido("barajar.mp3");
+  }
+
+  function iniciarJuego() {
+    if (!mezcladas.length) barajear();
+    if (primera) reproducirSonido("corre.mp3");
+
+    intervalo = setInterval(() => {
+      if (index < mezcladas.length) {
+        mostrarCarta(mezcladas[index]);
+        index++;
+      } else {
+        detenerJuego();
+      }
+    }, tiempo);
+  }
+
+  function siguienteCarta() {
     if (index < mezcladas.length) {
       mostrarCarta(mezcladas[index]);
       index++;
-    } else {
-      detenerJuego();
     }
-  }, tiempo);
-}
-
-function siguienteCarta() {
-  if (mezcladas.length && index < mezcladas.length) {
-    mostrarCarta(mezcladas[index]);
-    index++;
   }
-}
 
-function detenerJuego() {
-  clearInterval(intervalo);
-  confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-  reproducirSonido("aplausos.mp3");
-}
-
-function mostrarCarta(numero) {
-  const nombre = String(numero).padStart(2, '0');
-  const img = `img/${nombre}.png`;
-  document.getElementById("cartaActual").innerHTML = `<img src="${img}" alt="Carta ${numero}">`;
-  document.getElementById("historial").innerHTML += `<img src="${img}" alt="${numero}">`;
-
-  document.getElementById("cantadas").textContent = index + 1;
-  document.getElementById("faltantes").textContent = 54 - (index + 1);
-
-  if (index < 54) {
-    reproducirSonido(`audios/${nombre}.mp3`);
+  function detenerJuego() {
+    clearInterval(intervalo);
+    reproducirSonido("aplausos.mp3");
+    lanzarConfeti();
+    partidas++;
+    document.getElementById("partidas").textContent = partidas;
   }
-}
 
-function reproducirSonido(nombreArchivo) {
-  const audio = new Audio(nombreArchivo);
-  audio.play().catch(e => console.log("Autoplay bloqueado o error:", e));
-}
+  function mostrarCarta(numero) {
+    const nombre = nombres[numero];
+    const imagen = `img/${String(numero).padStart(2, '0')}.png`;
 
-window.addEventListener("load", () => {
-  setTimeout(() => document.getElementById("splash-screen").style.display = "none", 2500);
-});
+    const cartaActualDiv = document.getElementById("cartaActual");
+    cartaActualDiv.innerHTML = `<img src="${imagen}" alt="${nombre}" class="fade-in">`;
+
+    document.getElementById("historial").innerHTML += `<img src="${imagen}" alt="${nombre}">`;
+
+    document.getElementById("contadorCartas").textContent = index + 1;
+    document.getElementById("faltantes").textContent = 54 - (index + 1);
+
+    const audioNombre = `audios/${String(numero).padStart(2, '0')}.mp3`;
+    const audio = new Audio(audioNombre);
+    audio.play();
+  }
+
+  function reproducirSonido(nombreArchivo) {
+    const audio = new Audio(nombreArchivo);
+    audio.play();
+  }
+
+  function lanzarConfeti() {
+    const duration = 1 * 1000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 25, spread: 360, ticks: 60, zIndex: 2000 };
+
+    function randomInRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    const interval = setInterval(function () {
+      const timeLeft = animationEnd - Date.now();
+      if (timeLeft <= 0) return clearInterval(interval);
+
+      confetti({
+        particleCount: 60,
+        origin: {
+          x: randomInRange(0.1, 0.9),
+          y: Math.random() - 0.2
+        },
+        ...defaults
+      });
+    }, 250);
+  }
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
 </body>
 </html>
