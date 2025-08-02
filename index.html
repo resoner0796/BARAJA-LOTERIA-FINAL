@@ -179,9 +179,13 @@ function barajear() {
   document.getElementById("cartaActual").innerHTML = "";
   document.getElementById("historial").innerHTML = "";
   document.getElementById("loteriaTexto").style.display = "none";
-  detenerJuego();
+  detenerJuegoSilencioso();
   reproducirSonido("barajar.mp3");
   actualizarContadores();
+}
+
+function detenerJuegoSilencioso() {
+  clearInterval(intervalo);
 }
 
 function iniciarJuego() {
