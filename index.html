@@ -9,245 +9,209 @@
   <style>
     @font-face {
       font-family: 'BernardMT';
-      src: url('BernardMT.ttf');
+      src: url('BernardMT.ttf') format('truetype');
+      font-weight: bold;
     }
-
     body {
       margin: 0;
       font-family: 'BernardMT', sans-serif;
+      text-align: center;
+      color: white;
       background-image: url('fondo.jpg');
       background-size: cover;
-      background-repeat: no-repeat;
       background-position: center;
-      text-align: center;
-      color: #fff;
+      background-repeat: no-repeat;
+    }
+    h1 {
+      margin-top: 1rem;
+      font-size: 2rem;
+      text-shadow: 2px 2px 4px #000;
       text-transform: uppercase;
     }
-
-    #splash-screen {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background-color: #000;
-      z-index: 9999;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
-
-    #splash-screen img {
-      max-width: 80%;
-    }
-
     .btn {
       padding: 1rem 2rem;
-      font-size: 1.2rem;
+      font-size: 1rem;
       margin: 0.5rem;
       border: none;
       border-radius: 10px;
       background-color: #e60000;
       color: white;
       cursor: pointer;
+      text-transform: uppercase;
       box-shadow: 0 3px 5px rgba(0,0,0,0.2);
     }
-
     #controls, #cartaActual, #historial {
       margin-top: 1.5rem;
     }
-
+    #cartaActual {
+      margin-top: 1rem;
+      position: relative;
+      display: inline-block;
+      animation: fadein 0.5s ease-in-out;
+    }
     #cartaActual img {
       width: 220px;
-      margin-top: 1rem;
-      border: 5px solid gold;
+      border: 4px solid gold;
       border-radius: 15px;
+      box-shadow: 0 0 20px gold;
     }
-
     #historial {
-      max-width: 100%;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 8px;
-      margin-top: 20px;
+      gap: 6px;
+      margin: 1.5rem auto;
+      max-width: 90%;
     }
-
     #historial img {
-      width: 60px;
+      width: 50px;
+      border-radius: 5px;
     }
-
     label {
       font-weight: bold;
+      display: block;
+      margin-top: 1rem;
+      text-shadow: 1px 1px 2px black;
+      text-transform: uppercase;
     }
-
-    #contador {
+    select {
+      padding: 0.5rem;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    @keyframes fadein {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    #infoBar {
       display: flex;
       justify-content: space-around;
-      margin: 1rem 2rem;
-      font-size: 1.1rem;
-    }
-
-    /* Transición entre cartas */
-    .fade-in {
-      animation: fadeIn 0.5s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      0% { opacity: 0; transform: scale(0.9); }
-      100% { opacity: 1; transform: scale(1); }
+      margin-top: 1rem;
+      font-size: 1rem;
+      text-shadow: 1px 1px 2px #000;
     }
   </style>
 </head>
 <body>
 
-<div id="splash-screen">
-  <img src="splash.png" alt="Cargando..." />
-</div>
+  <h1>🎴 LOTERÍA MEXICANA</h1>
 
-<h1>🎴 LOTERÍA MEXICANA</h1>
+  <div id="controls">
+    <button class="btn" onclick="barajear()">🎲 BARAJEAR</button>
+    <button class="btn" onclick="iniciarJuego()">🔔 INICIAR JUEGO</button>
+    <button class="btn" onclick="siguienteCarta()">➡️ SIGUIENTE</button>
+    <button class="btn" onclick="detenerJuego()">✋ DETENER</button>
+    <label for="intervalo">SEGUNDOS ENTRE CARTAS:</label>
+    <select id="intervalo" onchange="actualizarIntervalo()">
+      <option value="2000">2 SEG</option>
+      <option value="3000">3 SEG</option>
+      <option value="4000" selected>4 SEG</option>
+      <option value="5000">5 SEG</option>
+    </select>
+  </div>
 
-<div id="controls">
-  <button class="btn" onclick="barajear()">🎲 BARAJEAR</button>
-  <button class="btn" onclick="iniciarJuego()">🔔 INICIAR JUEGO</button>
-  <button class="btn" onclick="siguienteCarta()">➡️ SIGUIENTE</button>
-  <button class="btn" onclick="detenerJuego()">✋ DETENER JUEGO</button><br>
-  <label for="intervalo">TIEMPO ENTRE CARTAS:</label>
-  <select id="intervalo" onchange="actualizarIntervalo()">
-    <option value="2000">2 SEGUNDOS</option>
-    <option value="3000">3 SEGUNDOS</option>
-    <option value="4000" selected>4 SEGUNDOS</option>
-    <option value="5000">5 SEGUNDOS</option>
-  </select>
-</div>
+  <div id="infoBar">
+    <div>CANTADAS: <span id="cantadas">0</span></div>
+    <div>FALTANTES: <span id="faltantes">54</span></div>
+    <div>PARTIDAS: <span id="partidas">0</span></div>
+  </div>
 
-<div id="contador">
-  <div>CANTADAS: <span id="contadorCartas">0</span></div>
-  <div>FALTANTES: <span id="faltantes">54</span></div>
-  <div>PARTIDAS: <span id="partidas">0</span></div>
-</div>
+  <div id="cartaActual"></div>
+  <div id="historial"></div>
 
-<div id="cartaActual"></div>
-<div id="historial"></div>
+  <canvas id="confetti" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;"></canvas>
 
-<script>
-  window.addEventListener("load", () => {
-    setTimeout(() => document.getElementById("splash-screen").style.display = "none", 2000);
-  });
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <script>
+    let barajas = Array.from({ length: 54 }, (_, i) => i + 1);
+    let mezcladas = [];
+    let index = 0;
+    let tiempo = 4000;
+    let intervalo = null;
+    let partidas = 0;
 
-  let barajas = Array.from({ length: 54 }, (_, i) => i + 1);
-  let mezcladas = [];
-  let intervalo = null;
-  let index = 0;
-  let tiempo = 4000;
-  let primera = true;
-  let partidas = 0;
+    const nombres = [
+      "", "EL GALLO", "EL DIABLITO", "LA DAMA", "EL CATRÍN", "EL PARAGUAS", "LA SIRENA", "LA ESCALERA", "LA BOTELLA",
+      "EL BARRIL", "EL ÁRBOL", "EL MELÓN", "EL VALIENTE", "EL GORRITO", "LA MUERTE", "LA PERA", "LA BANDERA",
+      "EL BANDOLÓN", "EL VIOLONCELLO", "LA GARZA", "EL PÁJARO", "LA MANO", "LA BOTA", "LA LUNA", "EL COTORRO",
+      "EL BORRACHO", "EL NEGRITO", "EL CORAZÓN", "LA SANDÍA", "EL TAMBOR", "EL CAMARÓN", "LAS JARAS", "EL MÚSICO",
+      "LA ARAÑA", "EL SOLDADO", "LA ESTRELLA", "EL CAZO", "EL MUNDO", "EL APACHE", "EL NOPAL", "EL ALACRÁN", "LA ROSA",
+      "LA CALAVERA", "LA CAMPANA", "EL CANTARITO", "EL VENADO", "EL SOL", "LA CORONA", "LA CHALUPA", "EL PINO",
+      "EL PESCADO", "LA PALMA", "LA MACETA", "EL ARPA", "LA RANA"
+    ];
 
-  const nombres = [
-    "", "El Gallo", "El Diablito", "La Dama", "El Catrín", "El Paraguas", "La Sirena", "La Escalera", "La Botella",
-    "El Barril", "El Árbol", "El Melón", "El Valiente", "El Gorrito", "La Muerte", "La Pera", "La Bandera",
-    "El Bandolón", "El Violoncello", "La Garza", "El Pájaro", "La Mano", "La Bota", "La Luna", "El Cotorro",
-    "El Borracho", "El Negrito", "El Corazón", "La Sandía", "El Tambor", "El Camarón", "Las Jaras", "El Músico",
-    "La Araña", "El Soldado", "La Estrella", "El Cazo", "El Mundo", "El Apache", "El Nopal", "El Alacrán", "La Rosa",
-    "La Calavera", "La Campana", "El Cantarito", "El Venado", "El Sol", "La Corona", "La Chalupa", "El Pino",
-    "El Pescado", "La Palma", "La Maceta", "El Arpa", "La Rana"
-  ];
+    function actualizarIntervalo() {
+      tiempo = parseInt(document.getElementById("intervalo").value);
+    }
 
-  function actualizarIntervalo() {
-    tiempo = parseInt(document.getElementById("intervalo").value);
-  }
+    function barajear() {
+      mezcladas = [...barajas].sort(() => Math.random() - 0.5);
+      index = 0;
+      partidas++;
+      document.getElementById("partidas").textContent = partidas;
+      document.getElementById("cantadas").textContent = "0";
+      document.getElementById("faltantes").textContent = "54";
+      document.getElementById("cartaActual").innerHTML = "";
+      document.getElementById("historial").innerHTML = "";
+      detenerJuego();
+      reproducir("barajar.mp3");
+    }
 
-  function barajear() {
-    mezcladas = [...barajas].sort(() => Math.random() - 0.5);
-    index = 0;
-    primera = true;
-    document.getElementById("cartaActual").innerHTML = "";
-    document.getElementById("historial").innerHTML = "";
+    function iniciarJuego() {
+      if (!mezcladas.length) barajear();
+      reproducir("corre.mp3");
+      reproducir("campana.mp3");
+      intervalo = setInterval(() => {
+        if (index < mezcladas.length) {
+          mostrarCarta(mezcladas[index++]);
+        } else {
+          detenerJuego();
+        }
+      }, tiempo);
+    }
 
-    document.getElementById("contadorCartas").textContent = "0";
-    document.getElementById("faltantes").textContent = "54";
-
-    detenerJuego();
-
-    reproducirSonido("barajar.mp3");
-  }
-
-  function iniciarJuego() {
-    if (!mezcladas.length) barajear();
-    if (primera) reproducirSonido("corre.mp3");
-
-    intervalo = setInterval(() => {
+    function siguienteCarta() {
+      if (!mezcladas.length) barajear();
       if (index < mezcladas.length) {
-        mostrarCarta(mezcladas[index]);
-        index++;
-      } else {
-        detenerJuego();
+        mostrarCarta(mezcladas[index++]);
       }
-    }, tiempo);
-  }
-
-  function siguienteCarta() {
-    if (index < mezcladas.length) {
-      mostrarCarta(mezcladas[index]);
-      index++;
-    }
-  }
-
-  function detenerJuego() {
-    clearInterval(intervalo);
-    reproducirSonido("aplausos.mp3");
-    lanzarConfeti();
-    partidas++;
-    document.getElementById("partidas").textContent = partidas;
-  }
-
-  function mostrarCarta(numero) {
-    const nombre = nombres[numero];
-    const imagen = `img/${String(numero).padStart(2, '0')}.png`;
-
-    const cartaActualDiv = document.getElementById("cartaActual");
-    cartaActualDiv.innerHTML = `<img src="${imagen}" alt="${nombre}" class="fade-in">`;
-
-    document.getElementById("historial").innerHTML += `<img src="${imagen}" alt="${nombre}">`;
-
-    document.getElementById("contadorCartas").textContent = index + 1;
-    document.getElementById("faltantes").textContent = 54 - (index + 1);
-
-    const audioNombre = `audios/${String(numero).padStart(2, '0')}.mp3`;
-    const audio = new Audio(audioNombre);
-    audio.play();
-  }
-
-  function reproducirSonido(nombreArchivo) {
-    const audio = new Audio(nombreArchivo);
-    audio.play();
-  }
-
-  function lanzarConfeti() {
-    const duration = 1 * 1000;
-    const animationEnd = Date.now() + duration;
-    const defaults = { startVelocity: 25, spread: 360, ticks: 60, zIndex: 2000 };
-
-    function randomInRange(min, max) {
-      return Math.random() * (max - min) + min;
     }
 
-    const interval = setInterval(function () {
-      const timeLeft = animationEnd - Date.now();
-      if (timeLeft <= 0) return clearInterval(interval);
+    function detenerJuego() {
+      clearInterval(intervalo);
+      reproducir("aplausos.mp3");
+      confetti();
+    }
 
-      confetti({
-        particleCount: 60,
-        origin: {
-          x: randomInRange(0.1, 0.9),
-          y: Math.random() - 0.2
-        },
-        ...defaults
+    function mostrarCarta(numero) {
+      const nombre = nombres[numero];
+      const ruta = `img/${String(numero).padStart(2, '0')}.png`;
+      const cartaHTML = `<img src="${ruta}" alt="${nombre}">`;
+      document.getElementById("cartaActual").innerHTML = cartaHTML;
+      document.getElementById("historial").innerHTML += `<img src="${ruta}" alt="${nombre}">`;
+
+      document.getElementById("cantadas").textContent = index;
+      document.getElementById("faltantes").textContent = 54 - index;
+
+      const audio = new Audio(`audios/${String(numero).padStart(2, '0')}.mp3`);
+      audio.play();
+    }
+
+    function reproducir(nombre) {
+      const sonido = new Audio(nombre);
+      sonido.play();
+    }
+
+    function confetti() {
+      confettiLib({
+        particleCount: 150,
+        spread: 100,
+        origin: { y: 0.6 }
       });
-    }, 250);
-  }
-</script>
+    }
 
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    const confettiLib = window.confetti;
+  </script>
 
 </body>
 </html>
