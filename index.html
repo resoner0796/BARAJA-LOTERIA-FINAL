@@ -1,94 +1,80 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LOTERÍA MEXICANA</title>
-  <link rel="apple-touch-icon" href="icon.png" />
-  <link rel="icon" type="image/png" href="icon.png" />
+  <link rel="icon" href="icon.png" />
   <style>
     @font-face {
       font-family: 'BernardMT';
-      src: url('BernardMT.ttf') format('truetype');
-      font-weight: bold;
+      src: url('BernardMT.ttf');
     }
     body {
       margin: 0;
-      font-family: 'BernardMT', sans-serif;
-      text-align: center;
-      color: white;
-      background-image: url('fondo.jpg');
+      font-family: 'BernardMT', cursive;
+      background: url('fondo.jpg') no-repeat center center fixed;
       background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+      color: white;
+      text-align: center;
+      text-transform: uppercase;
     }
     h1 {
-      margin-top: 1rem;
-      font-size: 2rem;
-      text-shadow: 2px 2px 4px #000;
-      text-transform: uppercase;
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 5px #000;
     }
     .btn {
       padding: 1rem 2rem;
-      font-size: 1rem;
+      font-size: 1.2rem;
       margin: 0.5rem;
       border: none;
       border-radius: 10px;
       background-color: #e60000;
       color: white;
       cursor: pointer;
-      text-transform: uppercase;
-      box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+      box-shadow: 0 3px 5px rgba(0,0,0,0.4);
     }
     #controls, #cartaActual, #historial {
       margin-top: 1.5rem;
     }
     #cartaActual {
-      margin-top: 1rem;
       position: relative;
-      display: inline-block;
-      animation: fadein 0.5s ease-in-out;
+      transition: opacity 0.8s ease;
     }
     #cartaActual img {
-      width: 220px;
-      border: 4px solid gold;
-      border-radius: 15px;
+      width: 200px;
+      border: 6px solid gold;
+      border-radius: 10px;
       box-shadow: 0 0 20px gold;
+      transition: transform 0.5s ease;
     }
     #historial {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 6px;
-      margin: 1.5rem auto;
-      max-width: 90%;
+      margin-top: 1.2rem;
     }
     #historial img {
       width: 50px;
       border-radius: 5px;
     }
-    label {
+    label, select {
       font-weight: bold;
-      display: block;
-      margin-top: 1rem;
-      text-shadow: 1px 1px 2px black;
-      text-transform: uppercase;
-    }
-    select {
-      padding: 0.5rem;
-      border-radius: 8px;
-      font-weight: bold;
-    }
-    @keyframes fadein {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    #infoBar {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 1rem;
       font-size: 1rem;
-      text-shadow: 1px 1px 2px #000;
+      margin-top: 1rem;
+    }
+    #loteria-text {
+      display: none;
+      font-size: 3rem;
+      color: white;
+      text-shadow: 3px 3px 5px #000;
+      margin-top: 1rem;
+      animation: aparecer 1s ease-out;
+    }
+    @keyframes aparecer {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
     }
   </style>
 </head>
@@ -97,37 +83,32 @@
   <h1>🎴 LOTERÍA MEXICANA</h1>
 
   <div id="controls">
-    <button class="btn" onclick="barajear()">🎲 BARAJEAR</button>
-    <button class="btn" onclick="iniciarJuego()">🔔 INICIAR JUEGO</button>
-    <button class="btn" onclick="siguienteCarta()">➡️ SIGUIENTE</button>
-    <button class="btn" onclick="detenerJuego()">✋ DETENER</button>
-    <label for="intervalo">SEGUNDOS ENTRE CARTAS:</label>
+    <button class="btn" onclick="barajear()">🎲 Barajear</button>
+    <button class="btn" onclick="iniciarJuego()">🔔 Iniciar Juego</button>
+    <button class="btn" onclick="detenerJuego()">✋ Detener Juego</button>
+    <label for="intervalo">Intervalo:</label>
     <select id="intervalo" onchange="actualizarIntervalo()">
-      <option value="2000">2 SEG</option>
-      <option value="3000">3 SEG</option>
-      <option value="4000" selected>4 SEG</option>
-      <option value="5000">5 SEG</option>
+      <option value="2000">2s</option>
+      <option value="3000">3s</option>
+      <option value="4000" selected>4s</option>
+      <option value="5000">5s</option>
     </select>
   </div>
 
-  <div id="infoBar">
-    <div>CANTADAS: <span id="cantadas">0</span></div>
-    <div>FALTANTES: <span id="faltantes">54</span></div>
-    <div>PARTIDAS: <span id="partidas">0</span></div>
-  </div>
-
   <div id="cartaActual"></div>
+  <div id="loteria-text">¡LOTERÍA!</div>
   <div id="historial"></div>
 
-  <canvas id="confetti" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;"></canvas>
+  <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;"></canvas>
 
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
     let barajas = Array.from({ length: 54 }, (_, i) => i + 1);
     let mezcladas = [];
+    let intervalo = null;
     let index = 0;
     let tiempo = 4000;
-    let intervalo = null;
+    let primera = true;
     let partidas = 0;
 
     const nombres = [
@@ -140,78 +121,88 @@
       "EL PESCADO", "LA PALMA", "LA MACETA", "EL ARPA", "LA RANA"
     ];
 
+    function reproducirSonido(archivo) {
+      const audio = new Audio(archivo);
+      audio.play();
+    }
+
     function actualizarIntervalo() {
       tiempo = parseInt(document.getElementById("intervalo").value);
     }
 
     function barajear() {
+      reproducirSonido("barajar.mp3");
       mezcladas = [...barajas].sort(() => Math.random() - 0.5);
       index = 0;
-      partidas++;
-      document.getElementById("partidas").textContent = partidas;
-      document.getElementById("cantadas").textContent = "0";
-      document.getElementById("faltantes").textContent = "54";
+      primera = true;
       document.getElementById("cartaActual").innerHTML = "";
       document.getElementById("historial").innerHTML = "";
+      document.getElementById("loteria-text").style.display = "none";
       detenerJuego();
-      reproducir("barajar.mp3");
     }
 
     function iniciarJuego() {
       if (!mezcladas.length) barajear();
-      reproducir("corre.mp3");
-      reproducir("campana.mp3");
+      reproducirSonido("corre.mp3");
+      setTimeout(() => reproducirSonido("campana.mp3"), 1000);
+      partidas++;
       intervalo = setInterval(() => {
         if (index < mezcladas.length) {
-          mostrarCarta(mezcladas[index++]);
+          mostrarCarta(mezcladas[index]);
+          index++;
         } else {
           detenerJuego();
         }
       }, tiempo);
     }
 
-    function siguienteCarta() {
-      if (!mezcladas.length) barajear();
-      if (index < mezcladas.length) {
-        mostrarCarta(mezcladas[index++]);
-      }
-    }
-
     function detenerJuego() {
       clearInterval(intervalo);
-      reproducir("aplausos.mp3");
-      confetti();
+      lanzarConfeti();
+      document.getElementById("loteria-text").style.display = "block";
+      reproducirSonido("aplausos.mp3");
     }
 
-    function mostrarCarta(numero) {
-      const nombre = nombres[numero];
-      const ruta = `img/${String(numero).padStart(2, '0')}.png`;
-      const cartaHTML = `<img src="${ruta}" alt="${nombre}">`;
-      document.getElementById("cartaActual").innerHTML = cartaHTML;
-      document.getElementById("historial").innerHTML += `<img src="${ruta}" alt="${nombre}">`;
+    function mostrarCarta(num) {
+      const carta = `img/${String(num).padStart(2, '0')}.png`;
+      const cartaDiv = document.getElementById("cartaActual");
+      cartaDiv.style.opacity = 0;
+      setTimeout(() => {
+        cartaDiv.innerHTML = `<img src="${carta}" alt="Carta">`;
+        cartaDiv.style.opacity = 1;
+      }, 300);
+      document.getElementById("historial").innerHTML += `<img src="${carta}">`;
 
-      document.getElementById("cantadas").textContent = index;
-      document.getElementById("faltantes").textContent = 54 - index;
-
-      const audio = new Audio(`audios/${String(numero).padStart(2, '0')}.mp3`);
-      audio.play();
+      const audioNombre = `audios/${String(num).padStart(2, '0')}.mp3`;
+      reproducirSonido(audioNombre);
     }
 
-    function reproducir(nombre) {
-      const sonido = new Audio(nombre);
-      sonido.play();
-    }
+    function lanzarConfeti() {
+      const duration = 2 * 1000;
+      const end = Date.now() + duration;
+      const colors = ['#bb0000', '#ffffff', '#ffd700'];
 
-    function confetti() {
-      confettiLib({
-        particleCount: 150,
-        spread: 100,
-        origin: { y: 0.6 }
-      });
-    }
+      (function frame() {
+        confetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: colors,
+        });
+        confetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: colors,
+        });
 
-    const confettiLib = window.confetti;
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      })();
+    }
   </script>
-
 </body>
 </html>
