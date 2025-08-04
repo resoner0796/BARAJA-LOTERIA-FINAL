@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Lotería Mexicana</title>
   <link rel="icon" type="image/png" href="icon.png" />
   <link rel="manifest" href="manifest.json">
@@ -22,7 +22,7 @@
       overflow-x: hidden;
     }
 
-    /* PANTALLA DE CARGA AJUSTADA A PANTALLA COMPLETA */
+    /* PANTALLA DE CARGA AJUSTADA */
     #splash-screen {
       position: fixed;
       top: 0; left: 0;
@@ -37,7 +37,41 @@
     }
 
     #splash-screen img {
-      max-width: 80%;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    #loading-text {
+      font-size: 1.5rem;
+      margin-top: 1.5rem;
+      animation: blink 1.2s infinite;
+      z-index: 1;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .spinner {
+      margin-top: 10px;
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      border-top: 4px solid #ffffff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      z-index: 1;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     h1 {
@@ -116,7 +150,9 @@
 <body>
 
 <div id="splash-screen">
-  <img src="splash.png" alt="Cargando..." />
+  <img src="splash.png" alt="Cargando fondo..." />
+  <div id="loading-text">Cargando...</div>
+  <div class="spinner"></div>
 </div>
 
 <h1>🎴 LOTERÍA MEXICANA</h1>
