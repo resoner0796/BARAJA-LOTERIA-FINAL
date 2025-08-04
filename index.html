@@ -46,20 +46,22 @@
       z-index: -1;
     }
 
+    #splash-footer {
+      position: absolute;
+      bottom: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
     #loading-text {
-      font-size: 1.5rem;
-      margin-top: 1.5rem;
+      font-size: 1.4rem;
+      margin-bottom: 10px;
       animation: blink 1.2s infinite;
       z-index: 1;
     }
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-
     .spinner {
-      margin-top: 10px;
       border: 4px solid rgba(255, 255, 255, 0.2);
       border-top: 4px solid #ffffff;
       border-radius: 50%;
@@ -67,6 +69,11 @@
       height: 40px;
       animation: spin 1s linear infinite;
       z-index: 1;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
     }
 
     @keyframes spin {
@@ -149,10 +156,13 @@
 </head>
 <body>
 
+<!-- SPLASH SCREEN -->
 <div id="splash-screen">
   <img src="splash.png" alt="Cargando fondo..." />
-  <div id="loading-text">Cargando...</div>
-  <div class="spinner"></div>
+  <div id="splash-footer">
+    <div id="loading-text">Cargando...</div>
+    <div class="spinner"></div>
+  </div>
 </div>
 
 <h1>🎴 LOTERÍA MEXICANA</h1>
@@ -184,7 +194,7 @@
 
 <script>
 window.addEventListener("load", () => {
-  setTimeout(() => document.getElementById("splash-screen").style.display = "none", 2500);
+  setTimeout(() => document.getElementById("splash-screen").style.display = "none", 6000);
 });
 
 let barajas = Array.from({ length: 54 }, (_, i) => i + 1);
