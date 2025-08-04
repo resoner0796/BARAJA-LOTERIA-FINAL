@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lotería Mexicana</title>
   <link rel="icon" type="image/png" href="icon.png" />
-  <link rel="manifest" href="manifest.json">  <style>
+  <link rel="manifest" href="manifest.json">
+  <style>
     @font-face {
       font-family: 'BernardMT';
       src: url('BernardMT.ttf') format('truetype');
@@ -21,10 +22,12 @@
       overflow-x: hidden;
     }
 
+    /* PANTALLA DE CARGA AJUSTADA A PANTALLA COMPLETA */
     #splash-screen {
       position: fixed;
       top: 0; left: 0;
-      width: 100%; height: 100%;
+      width: 100vw;
+      height: 100vh;
       background-color: #000;
       z-index: 9999;
       display: flex;
@@ -243,7 +246,7 @@ function lanzarConfeti() {
   });
 }
 </script>
-  
+
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
