@@ -169,6 +169,24 @@
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: none; z-index: 2000; 
       text-shadow: 0 10px 40px black; 
     }
+
+    /* --- SOPORTE PARA CONTROL REMOTO (ANDROID TV) --- */
+    
+    /* Cuando un botón o input recibe el "foco" del control remoto */
+    .btn:focus, input:focus, select:focus {
+      outline: 4px solid #ffffff; /* Borde blanco grueso */
+      box-shadow: 0 0 30px #ffd700; /* Resplandor dorado */
+      transform: scale(1.1); /* Se hace más grande */
+      z-index: 50;
+      background: linear-gradient(to right, #ff416c, #ff4b2b) !important; /* Color destacado */
+    }
+
+    /* Ajuste para que el input del código se note más */
+    input:focus {
+      background: #fff;
+      color: #000;
+    }
+    
   </style>
 </head>
 <body>
@@ -419,5 +437,25 @@ function mostrarLoteriaTV() {
 }
 </script>
 
+  <script>
+  // --- AUTO-FOCO PARA TV ---
+  // Cuando carga la app, intentamos poner el foco en el botón de TV por si es una Tele
+  window.addEventListener('load', () => {
+    const btnTV = document.querySelector('.setup-box .btn'); // El botón de "Crear Sala"
+    if(btnTV) btnTV.focus();
+  });
+
+  // Manejo básico de teclas de TV (Enter/OK)
+  document.addEventListener('keydown', (e) => {
+    // A veces las TV envían códigos raros, pero Enter suele ser 13
+    if (e.key === 'Enter') {
+      const activeElement = document.activeElement;
+      if (activeElement && activeElement.classList.contains('btn')) {
+        activeElement.click();
+      }
+    }
+  });
+</script>
+  
 </body>
 </html>
