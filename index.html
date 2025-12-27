@@ -6,29 +6,46 @@
   <title>Lotería Mexicana</title>
   <link rel="icon" type="image/png" href="icon.png" />
   <link rel="manifest" href="manifest.json">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+
   <style>
+    /* --- FUENTES --- */
     @font-face {
       font-family: 'BernardMT';
       src: url('BernardMT.ttf') format('truetype');
     }
 
+    :root {
+      --primary-color: #ff4b1f;
+      --primary-gradient: linear-gradient(135deg, #ff4b1f 0%, #ff9068 100%);
+      --secondary-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      --glass-bg: rgba(0, 0, 0, 0.65);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+      --shadow-soft: 0 10px 20px rgba(0,0,0,0.3);
+    }
+
     body {
       margin: 0;
-      font-family: 'BernardMT', sans-serif;
+      font-family: 'Poppins', sans-serif; /* Fuente moderna para el cuerpo */
       background: url('fondo.jpg') no-repeat center center fixed;
       background-size: cover;
       text-align: center;
       color: #fff;
       overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    /* PANTALLA DE CARGA AJUSTADA */
+    /* PANTALLA DE CARGA (Rediseñada) */
     #splash-screen {
       position: fixed;
       top: 0; left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: #000;
+      background: #1a1a1a;
       z-index: 9999;
       display: flex;
       justify-content: center;
@@ -41,154 +58,288 @@
       height: 100%;
       object-fit: cover;
       position: absolute;
-      top: 0;
-      left: 0;
+      opacity: 0.4;
       z-index: -1;
+      filter: blur(5px);
     }
 
     #splash-footer {
-      position: absolute;
-      bottom: 30px;
+      background: rgba(0,0,0,0.8);
+      padding: 20px 40px;
+      border-radius: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
     }
 
     #loading-text {
-      font-size: 1.4rem;
-      margin-bottom: 10px;
-      animation: blink 1.2s infinite;
-      z-index: 1;
+      font-family: 'BernardMT', sans-serif;
+      font-size: 1.8rem;
+      color: #ffcc00;
+      margin-bottom: 15px;
+      letter-spacing: 2px;
     }
 
     .spinner {
-      border: 4px solid rgba(255, 255, 255, 0.2);
-      border-top: 4px solid #ffffff;
+      border: 4px solid rgba(255, 204, 0, 0.1);
+      border-left: 4px solid #ffcc00;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      width: 50px;
+      height: 50px;
       animation: spin 1s linear infinite;
-      z-index: 1;
     }
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
+    /* --- UI PRINCIPAL --- */
     h1 {
-      font-size: 2.5rem;
-      margin-top: 1rem;
-      text-shadow: 2px 2px 5px black;
-      letter-spacing: 3px;
+      font-family: 'BernardMT', serif;
+      font-size: 3rem;
+      margin: 20px 0 10px 0;
+      color: #fff;
+      text-shadow: 0 4px 0 #000, 0 0 20px rgba(255, 215, 0, 0.6);
+      letter-spacing: 2px;
     }
 
-    .btn {
-      padding: 0.8rem 1.5rem;
-      font-size: 1.2rem;
-      margin: 0.4rem;
-      border: none;
-      border-radius: 10px;
-      background-color: #e60000;
-      color: white;
-      cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    /* CONTENEDOR DE CONTROLES (Glassmorphism) */
+    .controls-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: var(--glass-border);
+      border-radius: 20px;
+      padding: 20px;
+      width: 90%;
+      max-width: 600px;
+      margin: 10px auto;
+      box-shadow: var(--shadow-soft);
     }
 
-    #controls, #cartaActual, #historial, #contador {
-      margin-top: 1.5rem;
-    }
-
-    #cartaActual {
-      margin-top: 1rem;
-      transition: opacity 0.5s ease-in-out;
-    }
-
-    #cartaActual img {
-      width: 200px;
-      border: 4px solid gold;
-      border-radius: 12px;
-      box-shadow: 0 0 20px gold;
-    }
-
-    #historial {
-      max-width: 100%;
+    #controls {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 10px;
-      margin-top: 2rem;
+      margin-top: 0;
+    }
+
+    /* --- BOTONES PRO --- */
+    .btn {
+      padding: 12px 24px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      border-radius: 50px; /* Redondos modernos */
+      background: var(--primary-gradient);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 75, 31, 0.4);
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Botón Siguiente (Destacado) */
+    .btn:nth-child(3) {
+      background: var(--secondary-gradient);
+      box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+      font-size: 1.1rem;
+      padding: 14px 28px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    /* INPUT SELECT ESTILIZADO */
+    .input-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    select {
+      background: rgba(0,0,0,0.4);
+      color: white;
+      border: 1px solid #555;
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* --- CONTADORES --- */
+    #contador {
+      display: flex;
+      justify-content: space-around;
+      width: 90%;
+      max-width: 500px;
+      margin: 15px auto;
+      background: rgba(0,0,0,0.6);
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,215,0,0.3);
+    }
+
+    #contador div {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #ffd700; /* Dorado */
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    #contador span {
+      color: #fff;
+      font-size: 1.1rem;
+    }
+
+    /* --- CARTA ACTUAL --- */
+    #cartaActual {
+      margin: 20px auto;
+      height: 320px; /* Espacio reservado fijo para evitar saltos */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    #cartaActual img {
+      width: 220px; /* Un poco más grande */
+      border: 6px solid #ffd700;
+      border-radius: 16px;
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 10px 20px rgba(0,0,0,0.5);
+      transform: rotate(-2deg); /* Ligera rotación para estilo */
+      transition: transform 0.3s;
+    }
+
+    #cartaActual img:hover {
+      transform: rotate(0deg) scale(1.05);
+    }
+
+    /* --- HISTORIAL --- */
+    #historial {
+      width: 95%;
+      max-width: 800px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin: 1rem auto 3rem auto;
+      padding: 15px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 15px;
     }
 
     #historial img {
-      width: 60px;
-      border-radius: 5px;
+      width: 50px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.3);
+      opacity: 0.7;
+      transition: all 0.2s;
     }
 
-    label {
-      font-weight: bold;
-      margin-top: 1rem;
+    #historial img:hover {
+      opacity: 1;
+      transform: scale(1.2);
+      z-index: 10;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
     }
 
-    #contador {
-      font-size: 1rem;
-      font-weight: bold;
-      text-shadow: 1px 1px 4px black;
-    }
-
+    /* --- MENSAJE DE LOTERÍA --- */
     #loteriaTexto {
-      font-size: 3rem;
-      color: white;
-      position: absolute;
-      top: 30%;
+      font-family: 'BernardMT', serif;
+      font-size: 5rem;
+      background: linear-gradient(to bottom, #ffd700, #ff8c00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: fixed; /* Fixed para que siempre esté centrado en pantalla */
+      top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 999;
+      transform: translate(-50%, -50%) scale(0);
+      z-index: 2000;
       display: none;
-      text-shadow: 3px 3px 8px black;
+      filter: drop-shadow(0 5px 5px rgba(0,0,0,0.8));
+      animation: popIn 0.5s forwards;
+    }
+
+    @keyframes popIn {
+      0% { transform: translate(-50%, -50%) scale(0); }
+      80% { transform: translate(-50%, -50%) scale(1.2); }
+      100% { transform: translate(-50%, -50%) scale(1); }
+    }
+
+    /* Ajustes Mobile */
+    @media (max-width: 600px) {
+      h1 { font-size: 2.2rem; }
+      .btn { padding: 10px 15px; font-size: 0.9rem; flex: 1 1 40%; }
+      #cartaActual img { width: 180px; }
+      #contador { flex-direction: column; gap: 5px; }
     }
   </style>
 </head>
 <body>
 
-<!-- SPLASH SCREEN -->
 <div id="splash-screen">
   <img src="splash.png" alt="Cargando fondo..." />
   <div id="splash-footer">
-    <div id="loading-text">Cargando...</div>
+    <div id="loading-text">CARGANDO...</div>
     <div class="spinner"></div>
   </div>
 </div>
 
 <h1>🎴 LOTERÍA MEXICANA</h1>
 
-<div id="controls">
-  <button class="btn" onclick="barajear()">🎲 Barajear</button>
-  <button class="btn" onclick="iniciarJuego()">🔔 Iniciar Juego</button>
-  <button class="btn" onclick="mostrarSiguiente()">⏭️ Siguiente</button>
-  <button class="btn" onclick="detenerJuego()">✋ Detener Juego</button><br>
-  <label for="intervalo">Segundos entre cartas:</label>
-  <select id="intervalo" onchange="actualizarIntervalo()">
-    <option value="2000">2 segundos</option>
-    <option value="3000">3 segundos</option>
-    <option value="4000" selected>4 segundos</option>
-    <option value="5000">5 segundos</option>
-  </select>
+<div class="controls-panel">
+  <div id="controls">
+    <button class="btn" onclick="barajear()">🎲 Barajear</button>
+    <button class="btn" onclick="iniciarJuego()">🔔 Iniciar</button>
+    <button class="btn" onclick="mostrarSiguiente()">⏭️ Siguiente</button>
+    <button class="btn" onclick="detenerJuego()" style="background: linear-gradient(135deg, #d31027, #ea384d);">✋ Detener</button>
+  </div>
+  
+  <div class="input-group">
+    <label for="intervalo">Velocidad:</label>
+    <select id="intervalo" onchange="actualizarIntervalo()">
+      <option value="2000">🚀 Rápido (2s)</option>
+      <option value="3000">🐇 Normal (3s)</option>
+      <option value="4000" selected>🐢 Lento (4s)</option>
+      <option value="5000">🐌 Muy Lento (5s)</option>
+    </select>
+  </div>
 </div>
 
 <div id="contador">
-  <div>🃏 CARTAS CANTADAS: <span id="cartasContadas">0</span> / <span id="cartasRestantes">54</span></div>
-  <div>🧩 PARTIDAS JUGADAS: <span id="partidasJugadas">0</span></div>
+  <div>🃏 Cartas: <span id="cartasContadas">0</span> / <span id="cartasRestantes">54</span></div>
+  <div>🧩 Partidas: <span id="partidasJugadas">0</span></div>
 </div>
 
 <div id="loteriaTexto">¡LOTERÍA!</div>
-<div id="cartaActual"></div>
-<div id="historial"></div>
+
+<div id="cartaActual">
+  </div>
+
+<div id="historial">
+  </div>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
