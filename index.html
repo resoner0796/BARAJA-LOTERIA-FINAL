@@ -10,16 +10,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
 
   <style>
-    /* --- FUENTES & VARIABLES --- */
-    @font-face {
-      font-family: 'BernardMT';
-      src: url('BernardMT.ttf') format('truetype');
-    }
-
     :root {
       --primary-gradient: linear-gradient(135deg, #ff4b1f 0%, #ff9068 100%);
       --secondary-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-      --glass-bg: rgba(0, 0, 0, 0.75); /* Un poco más oscuro para contraste */
+      --glass-bg: rgba(0, 0, 0, 0.85);
       --glass-border: 1px solid rgba(255, 255, 255, 0.15);
       --gold-glow: 0 0 25px rgba(255, 215, 0, 0.6);
     }
@@ -30,9 +24,10 @@
       background: url('fondo.jpg') no-repeat center center fixed;
       background-size: cover;
       color: #fff;
-      height: 100vh;
+      min-height: 100vh; /* Permite crecer si es necesario */
       width: 100vw;
-      overflow: hidden; /* Evita scroll en la pantalla principal */
+      overflow-x: hidden; /* Solo ocultamos el scroll horizontal */
+      overflow-y: auto;   /* Habilitamos scroll vertical */
       display: flex;
       flex-direction: column;
     }
@@ -44,39 +39,45 @@
       display: flex; justify-content: center; align-items: center; flex-direction: column;
     }
     #splash-screen img { position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.4; filter: blur(5px); z-index: -1; }
-    #loading-text { font-family: 'BernardMT'; font-size: 1.5rem; color: #ffcc00; margin-bottom: 15px; }
+    #loading-text { font-weight: 800; font-size: 1.5rem; color: #ffcc00; margin-bottom: 15px; letter-spacing: 2px; }
     .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #ffcc00; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* --- LAYOUT PRINCIPAL (Flexbox Vertical) --- */
+    /* --- LAYOUT PRINCIPAL --- */
     
-    /* 1. SECCIÓN SUPERIOR: Título e Historial */
     header {
       flex: 0 0 auto;
-      padding: 10px;
-      background: rgba(0,0,0,0.3);
+      padding: 15px 10px;
+      background: rgba(0,0,0,0.4);
       backdrop-filter: blur(5px);
       border-bottom: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
     }
 
+    /* TÍTULO REDISEÑADO (MODERNO) */
     h1 {
-      font-family: 'BernardMT', serif;
-      font-size: 1.8rem; /* Más pequeño para dar espacio */
+      font-family: 'Poppins', sans-serif;
+      font-weight: 800; /* Extra Bold */
+      font-size: 2rem;
       margin: 0 0 10px 0;
-      text-shadow: 2px 2px 4px black;
-      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      background: linear-gradient(to right, #ffffff, #e0e0e0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
     }
 
     #historial {
       display: flex;
       flex-direction: row;
-      flex-wrap: nowrap; /* No bajar de línea */
-      overflow-x: auto; /* Scroll horizontal si se llena */
+      flex-wrap: nowrap;
+      overflow-x: auto;
       gap: 8px;
       padding: 5px 10px;
       min-height: 60px;
       align-items: center;
-      /* Ocultar barra de scroll estética */
+      justify-content: flex-start; /* Alineado a la izquierda para ir viendo flujo */
       scrollbar-width: thin;
       scrollbar-color: #ff4b1f transparent;
     }
@@ -85,68 +86,58 @@
     #historial::-webkit-scrollbar-thumb { background: #ff4b1f; border-radius: 10px; }
 
     #historial img {
-      width: 45px;
-      height: auto;
-      border-radius: 5px;
+      width: 50px;
+      border-radius: 6px;
       border: 1px solid rgba(255,255,255,0.4);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-      flex-shrink: 0; /* Que no se aplasten */
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+      flex-shrink: 0;
       animation: fadeIn 0.5s ease;
     }
 
-    /* 2. SECCIÓN CENTRAL: La Carta (Área Flexible) */
+    /* SECCIÓN CENTRAL (CARTA) */
     main {
-      flex: 1; /* Ocupa el espacio sobrante */
+      flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      position: relative;
+      padding: 20px 0; /* Espacio arriba y abajo */
     }
 
     #cartaActual {
       position: relative;
-      perspective: 1000px;
       z-index: 10;
+      margin-bottom: 10px;
     }
 
     #cartaActual img {
-      width: 240px; /* Tamaño grande */
-      max-width: 80vw;
+      width: 260px;
+      max-width: 85vw;
       border: 6px solid #ffd700;
-      border-radius: 18px;
-      box-shadow: var(--gold-glow), 0 20px 40px rgba(0,0,0,0.6);
-      /* ANIMACIÓN DE ENTRADA FLUIDA */
-      animation: dealCard 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); /* Efecto rebote suave */
+      border-radius: 20px;
+      box-shadow: var(--gold-glow), 0 20px 50px rgba(0,0,0,0.7);
+      animation: dealCard 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    /* Keyframes para la entrada suave */
     @keyframes dealCard {
-      0% { 
-        opacity: 0;
-        transform: translateY(-80px) scale(0.5) rotate(-10deg);
-      }
-      100% { 
-        opacity: 1;
-        transform: translateY(0) scale(1) rotate(0deg);
-      }
+      0% { opacity: 0; transform: translateY(-80px) scale(0.5) rotate(-10deg); }
+      100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
     }
-
     @keyframes fadeIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
-    /* CONTADORES FLOTANTES (Debajo de la carta pero sutiles) */
     #contador {
-      margin-top: 15px;
-      background: rgba(0,0,0,0.5);
-      padding: 5px 15px;
-      border-radius: 20px;
+      background: rgba(0,0,0,0.6);
+      padding: 8px 20px;
+      border-radius: 30px;
       font-size: 0.9rem;
       display: flex;
-      gap: 15px;
+      gap: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      margin-top: 10px;
     }
-    #contador span { color: #ffd700; font-weight: bold; }
+    #contador span { color: #ffd700; font-weight: 700; }
 
-    /* 3. SECCIÓN INFERIOR: Controles */
+    /* --- BOTTOM PANEL REORGANIZADO --- */
     .bottom-panel {
       flex: 0 0 auto;
       background: var(--glass-bg);
@@ -155,89 +146,98 @@
       border-top: var(--glass-border);
       padding: 20px;
       border-radius: 25px 25px 0 0;
-      box-shadow: 0 -5px 20px rgba(0,0,0,0.4);
-      animation: slideUp 0.8s ease-out;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
     }
 
-    /* GRID PARA BOTONES "A LO ANCHO Y LARGO" */
+    /* SELECTOR DE VELOCIDAD (AHORA ARRIBA DE LOS BOTONES) */
+    .speed-control-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 15px; /* Separación de los botones */
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 12px;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .speed-control-container label {
+      margin-right: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #ddd;
+    }
+
+    select {
+      background: #222;
+      border: 1px solid #555;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* GRID DE BOTONES */
     #controls {
       display: grid;
-      grid-template-columns: 1fr 1fr; /* 2 columnas */
+      grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-bottom: 10px;
     }
 
-    /* Botón Siguiente ocupa 2 columnas para ser el principal */
-    .btn-large {
-      grid-column: span 2;
-    }
+    .btn-large { grid-column: span 2; }
 
     .btn {
-      padding: 15px;
+      padding: 16px;
       font-family: 'Poppins', sans-serif;
       font-weight: 700;
       font-size: 1rem;
       border: none;
       border-radius: 12px;
-      background: #333; /* Fallback */
       color: white;
       cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 8px;
-      transition: transform 0.2s;
-      box-shadow: 0 4px 0 rgba(0,0,0,0.3); /* Efecto 3D sutil */
-    }
-
-    .btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 rgba(0,0,0,0.3);
-    }
-
-    /* Colores Específicos */
-    .btn-shuffle { background: linear-gradient(135deg, #667eea, #764ba2); }
-    .btn-start { background: var(--secondary-gradient); }
-    .btn-next { 
-      background: var(--primary-gradient); 
-      font-size: 1.2rem; 
-      letter-spacing: 1px;
+      transition: transform 0.1s, filter 0.2s;
       text-transform: uppercase;
-    }
-    .btn-stop { background: linear-gradient(135deg, #eb3349, #f45c43); color: white; }
-
-    /* Select de velocidad estilizado */
-    .speed-control {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      margin-top: 10px;
-      font-size: 0.9rem;
-      opacity: 0.8;
-    }
-    
-    select {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: white;
-      padding: 5px 10px;
-      border-radius: 8px;
+      letter-spacing: 0.5px;
     }
 
-    /* TEXTO LOTERIA (Overlay) */
+    .btn:active { transform: translateY(3px); }
+
+    .btn-shuffle { background: #5c6bc0; box-shadow: 0 4px 0 #3949ab; }
+    .btn-start { background: #26a69a; box-shadow: 0 4px 0 #00897b; }
+    .btn-next { 
+      background: linear-gradient(to right, #ff512f, #dd2476); 
+      box-shadow: 0 4px 0 #a30036;
+      font-size: 1.1rem;
+    }
+    .btn-stop { background: #ef5350; box-shadow: 0 4px 0 #c62828; }
+
     #loteriaTexto {
       position: fixed; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      font-family: 'BernardMT'; font-size: 5rem;
+      font-family: 'Poppins', sans-serif; 
+      font-weight: 800;
+      font-size: 4rem;
       background: linear-gradient(to bottom, #ffd700, #ff8c00);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       z-index: 2000; display: none;
-      filter: drop-shadow(0 5px 10px black);
+      text-shadow: 0 10px 20px rgba(0,0,0,0.5);
     }
 
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
+    /* Ajuste para pantallas pequeñas (scroll) */
+    @media (max-height: 700px) {
+      main { padding: 10px 0; }
+      #cartaActual img { width: 200px; }
+      h1 { font-size: 1.5rem; }
+    }
   </style>
 </head>
 <body>
@@ -252,8 +252,7 @@
 
 <header>
   <h1>🎴 LOTERÍA MEXICANA</h1>
-  <div id="historial">
-    </div>
+  <div id="historial"></div>
 </header>
 
 <main>
@@ -269,6 +268,16 @@
 </main>
 
 <div class="bottom-panel">
+  <div class="speed-control-container">
+    <label for="intervalo">⏱️ Velocidad de carta:</label>
+    <select id="intervalo" onchange="actualizarIntervalo()">
+      <option value="2000">🚀 Rápido (2s)</option>
+      <option value="3000">🐇 Normal (3s)</option>
+      <option value="4000" selected>🐢 Tranqui (4s)</option>
+      <option value="5000">🐌 Lento (5s)</option>
+      <option value="6000">☕ Muy Lento (6s)</option> </select>
+  </div>
+
   <div id="controls">
     <button class="btn btn-shuffle" onclick="barajear()">🎲 Barajear</button>
     <button class="btn btn-start" onclick="iniciarJuego()">🔔 Iniciar</button>
@@ -280,16 +289,6 @@
     <button class="btn btn-stop btn-large" onclick="detenerJuego()">
       ✋ Detener Juego
     </button>
-  </div>
-
-  <div class="speed-control">
-    <label for="intervalo">⏱️ Velocidad:</label>
-    <select id="intervalo" onchange="actualizarIntervalo()">
-      <option value="2000">Rápido (2s)</option>
-      <option value="3000">Normal (3s)</option>
-      <option value="4000" selected>Tranqui (4s)</option>
-      <option value="5000">Lento (5s)</option>
-    </select>
   </div>
 </div>
 
@@ -305,12 +304,10 @@ let mezcladas = [];
 let intervalo = null;
 let index = 0;
 let tiempo = 4000;
-let primera = true;
 let partidasJugadas = 0;
 
 function actualizarIntervalo() {
   tiempo = parseInt(document.getElementById("intervalo").value);
-  // Si el juego está corriendo, reiniciar el intervalo con el nuevo tiempo
   if (intervalo) {
     clearInterval(intervalo);
     intervalo = setInterval(() => {
@@ -326,13 +323,12 @@ function actualizarContadores() {
 
 function reproducirSonido(nombreArchivo) {
   const audio = new Audio(nombreArchivo);
-  audio.play().catch(e => console.log("Audio play error (user interaction needed first):", e));
+  audio.play().catch(e => console.log("Audio interact needed"));
 }
 
 function barajear() {
   mezcladas = [...barajas].sort(() => Math.random() - 0.5);
   index = 0;
-  primera = true;
   document.getElementById("cartaActual").innerHTML = "";
   document.getElementById("historial").innerHTML = "";
   document.getElementById("loteriaTexto").style.display = "none";
@@ -348,7 +344,7 @@ function detenerJuegoSilencioso() {
 
 function iniciarJuego() {
   if (!mezcladas.length) barajear();
-  if (intervalo) return; // Evitar múltiples intervalos
+  if (intervalo) return;
   
   reproducirSonido("campana.mp3");
   reproducirSonido("corre.mp3");
@@ -382,47 +378,33 @@ function mostrarCarta(numero) {
   const imagen = `img/${nombre}.png`;
   const audio = `audios/${nombre}.mp3`;
 
-  // Crear la imagen
   const imgElement = document.createElement('img');
   imgElement.src = imagen;
   imgElement.alt = `Carta ${numero}`;
   
-  // Referencias DOM
   const historial = document.getElementById("historial");
   const actual = document.getElementById("cartaActual");
 
-  // Limpiar y poner la nueva carta (esto reinicia la animación CSS automáticamente)
   actual.innerHTML = ''; 
   actual.appendChild(imgElement);
 
-  // Agregar al historial (al principio o al final, aquí lo agrego al principio para ver la reciente primero a la izquierda, o al final como prefieras)
-  // Usaremos prepend para que la más reciente salga al lado izquierdo del historial, o append para derecho.
-  // Lo común es append (derecha):
+  // Agregar al historial (al inicio para ver las recientes a la izquierda)
   const historyImg = document.createElement('img');
   historyImg.src = imagen;
-  historial.appendChild(historyImg);
-  
-  // Auto scroll al final del historial
-  historial.scrollLeft = historial.scrollWidth;
+  historial.prepend(historyImg); // Cambiado a PREPEND para ver la última carta luego luego
 
   reproducirSonido(audio);
 }
 
 function lanzarConfeti() {
-  confetti({
-    particleCount: 150,
-    spread: 70,
-    origin: { y: 0.6 }
-  });
+  confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
 }
 </script>
 
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('Service Worker registrado:', reg.scope))
-        .catch(err => console.error('Error al registrar Service Worker:', err));
+      navigator.serviceWorker.register('sw.js').catch(err => console.error(err));
     });
   }
 </script>
