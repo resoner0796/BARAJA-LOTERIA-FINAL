@@ -3,126 +3,144 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Lotería Mexicana P2P</title>
+  <title>Lotería Mexicana Master</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
   <style>
+    /* --- VARIABLES PRO (COMO TE GUSTABAN) --- */
     :root {
+      --primary-gradient: linear-gradient(135deg, #ff4b1f 0%, #ff9068 100%);
       --glass-bg: rgba(20, 20, 20, 0.95);
       --glass-border: 1px solid rgba(255, 255, 255, 0.1);
       --gold-glow: 0 0 35px rgba(255, 215, 0, 0.6);
     }
+
     body {
       margin: 0; font-family: 'Poppins', sans-serif;
       background: url('fondo.jpg') no-repeat center center fixed; background-size: cover;
-      color: #fff; height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+      color: #fff; height: 100vh; overflow-y: auto; display: flex; flex-direction: column;
     }
 
-    /* --- PANTALLA DE INICIO (SELECCIÓN) --- */
+    /* --- PANTALLA DE CONEXIÓN (SETUP) --- */
     #setup-screen {
       position: fixed; top:0; left:0; width:100%; height:100%;
-      background: rgba(0,0,0,0.95); z-index: 10000;
+      background: rgba(10, 10, 10, 0.98); z-index: 10000;
       display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px;
       text-align: center;
     }
-    .setup-box { background: #222; padding: 30px; border-radius: 20px; border: 1px solid #444; max-width: 90%; }
-    input { padding: 15px; font-size: 1.2rem; text-align: center; border-radius: 10px; border: none; margin-top: 10px; width: 200px; text-transform: uppercase; font-weight: bold; letter-spacing: 2px;}
+    .setup-box { background: #1a1a1a; padding: 30px; border-radius: 20px; border: 1px solid #333; max-width: 90%; width: 300px; box-shadow: 0 10px 30px black; }
+    .setup-box h3 { margin-top: 0; color: #ffd700; }
     
-    /* --- MODIFICACIONES PARA TV --- */
+    input { 
+      padding: 12px; font-size: 1.2rem; text-align: center; border-radius: 10px; border: 1px solid #555; 
+      background: #333; color: white; margin-top: 10px; width: 80%; text-transform: uppercase; font-weight: bold; letter-spacing: 2px;
+    }
+    
+    /* --- MODO TV (VISOR) --- */
     body.tv-mode header, body.tv-mode .bottom-panel { display: none !important; }
+    body.tv-mode { background: #000; padding: 20px; box-sizing: border-box; justify-content: space-between; overflow: hidden; }
     
-    body.tv-mode {
-      justify-content: space-between; /* Espacio entre carta y historial */
-      background: #000;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-
     /* Carta en TV */
-    body.tv-mode #main-content {
-      flex: 1; display: flex; justify-content: center; align-items: center; width: 100%;
-    }
-    body.tv-mode #cartaActual img {
-      height: 70vh; /* Ocupa buen espacio pero deja lugar al historial */
-      width: auto;
-      border: 8px solid #ffd700;
-      box-shadow: 0 0 60px rgba(255, 215, 0, 0.5);
-    }
+    body.tv-mode #main-content { flex: 1; display: flex; justify-content: center; align-items: center; width: 100%; }
+    body.tv-mode #cartaActual img { height: 70vh; width: auto; border: 10px solid #ffd700; box-shadow: 0 0 80px rgba(255, 215, 0, 0.6); }
 
-    /* Historial en TV (NUEVO) */
+    /* Historial TV (NUEVO) */
     body.tv-mode #historial-tv {
-      display: flex !important; /* Forzar mostrar */
-      height: 15vh;
-      width: 100%;
-      background: rgba(255,255,255,0.1);
-      border-radius: 15px;
-      align-items: center;
-      padding: 0 10px;
-      gap: 10px;
-      overflow-x: hidden; /* Ocultamos scroll para que se vea limpio, insertaremos al inicio */
-      border: 1px solid rgba(255,255,255,0.2);
+      display: flex !important; height: 15vh; width: 100%; background: rgba(255,255,255,0.08);
+      border-radius: 15px; align-items: center; padding: 0 10px; gap: 10px; overflow-x: hidden;
+      border: 1px solid rgba(255,255,255,0.1); margin-top: 20px;
     }
-    body.tv-mode #historial-tv img {
-      height: 80%;
-      border-radius: 8px;
-      border: 2px solid rgba(255,255,255,0.5);
-      opacity: 0.7;
-    }
-    /* La carta más reciente en el historial brilla más */
-    body.tv-mode #historial-tv img:first-child {
-      opacity: 1; border-color: #ffd700; transform: scale(1.05);
-    }
+    body.tv-mode #historial-tv img { height: 85%; border-radius: 8px; opacity: 0.6; }
+    body.tv-mode #historial-tv img:first-child { opacity: 1; border: 2px solid #ffd700; transform: scale(1.1); margin-right: 15px; }
 
-    /* --- UI CELULAR (HOST) --- */
-    header { padding: 10px; background: rgba(0,0,0,0.5); text-align: center; }
-    h1 { margin: 0; font-size: 1.5rem; color: #fff; text-shadow: 0 2px 4px black; }
+    /* --- UI CELULAR (CONTROL) --- */
+    header { padding: 10px; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    h1 { margin: 5px 0 10px 0; font-size: 1.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; 
+         background: linear-gradient(to right, #ffffff, #dcdcdc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    #historial { display: flex; overflow-x: auto; gap: 8px; height: 70px; padding: 5px 10px; align-items: center; }
+    #historial img { height: 60px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+    #historial-tv { display: none; } /* Oculto en el cel */
+
+    /* Main Content */
+    #main-content { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; width: 100%; min-height: 400px; }
+    #cartaActual { display: flex; justify-content: center; width: 100%; height: 350px; } /* Altura fija para no saltar */
+    #cartaActual img { 
+      height: 320px; max-width: 90%; border: 6px solid #ffd700; border-radius: 18px; 
+      box-shadow: var(--gold-glow); animation: dealCard 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    }
     
-    #historial { display: flex; overflow-x: auto; gap: 5px; height: 60px; padding: 5px; justify-content: flex-start; }
-    #historial img { height: 100%; border-radius: 4px; border: 1px solid #fff; }
+    @keyframes dealCard { 0% { opacity: 0; transform: scale(0.5) translateY(-50px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
 
-    /* Ocultar historial de TV en modo Celular */
-    #historial-tv { display: none; }
+    /* --- BOTTOM PANEL (CONTROLES PRO) --- */
+    .bottom-panel { 
+      background: var(--glass-bg); padding: 20px; border-radius: 25px 25px 0 0; 
+      border-top: var(--glass-border); box-shadow: 0 -10px 40px rgba(0,0,0,0.7); 
+    }
 
-    main { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; width: 100%; }
-    #cartaActual { display: flex; justify-content: center; width: 100%; }
-    #cartaActual img { height: 300px; border: 5px solid #ffd700; border-radius: 15px; animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    @keyframes pop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-
-    .bottom-panel { background: var(--glass-bg); padding: 15px; border-radius: 20px 20px 0 0; border-top: var(--glass-border); }
-    .status-bar { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; color: #ffd700; }
-    .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .btn { padding: 15px; border-radius: 10px; border: none; font-weight: bold; color: white; cursor: pointer; font-size: 1rem; }
-    .btn-full { grid-column: span 2; font-size: 1.2rem; }
+    /* Barra de Estado (Contadores + Selector) */
+    .status-bar { 
+      display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); 
+      padding: 10px 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); 
+    }
+    .counters span { color: #ffd700; font-weight: 800; font-size: 1.1rem; }
     
-    #loteriaTexto { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 5rem; font-weight: 900; background: linear-gradient(to bottom, #ffd700, #ff8c00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: none; z-index: 2000; text-shadow: 0 10px 40px black;}
+    /* Selector Estilizado */
+    .speed-control select {
+      background: #333; color: white; border: 1px solid #555; padding: 8px 12px; border-radius: 8px;
+      font-family: 'Poppins', sans-serif; font-size: 0.9rem; outline: none; cursor: pointer;
+    }
+
+    /* Grid de Botones */
+    .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn { 
+      padding: 14px; border-radius: 10px; border: none; font-weight: 700; color: white; cursor: pointer; 
+      font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; transition: transform 0.1s;
+      display: flex; justify-content: center; align-items: center; gap: 8px; font-family: 'Poppins', sans-serif;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-large { grid-column: span 2; font-size: 1.1rem; }
+
+    /* Colores Pro (Restaurados) */
+    .btn-shuffle { background: #3f51b5; box-shadow: 0 4px 0 #283593; }
+    .btn-start { background: #009688; box-shadow: 0 4px 0 #00695c; }
+    .btn-next { background: linear-gradient(to right, #ff416c, #ff4b2b); box-shadow: 0 4px 0 #b71c1c; }
+    .btn-stop { background: #444; box-shadow: 0 4px 0 #222; border: 1px solid #666; }
+
+    /* Mensaje Lotería */
+    #loteriaTexto { 
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+      font-size: 5rem; font-weight: 900; background: linear-gradient(to bottom, #ffd700, #ff8c00); 
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: none; z-index: 2000; 
+      text-shadow: 0 10px 40px black; 
+    }
   </style>
 </head>
 <body>
 
 <div id="setup-screen">
-  <h1 style="font-size: 2.5rem; margin-bottom: 20px;">🎴 LOTERÍA CONNECT</h1>
+  <h1 style="color: white; margin-bottom: 20px;">🎴 LOTERÍA CONNECT</h1>
   
   <div class="setup-box">
-    <h3>📺 ¿ERES LA PANTALLA?</h3>
+    <h3>📺 MODO PANTALLA</h3>
     <button class="btn" style="background: linear-gradient(to right, #8e2de2, #4a00e0); width:100%;" onclick="iniciarComoTV()">
-      Crear Sala (TV)
+      Crear Sala
     </button>
     <div id="tv-code-display" style="margin-top:15px; display:none;">
-      <p>Tu Código de Sala:</p>
-      <h1 id="room-code" style="color:#ffd700; font-size:3rem; letter-spacing:5px;">...</h1>
-      <p style="font-size:0.8rem; opacity:0.7;">Ingresa este código en tu celular</p>
+      <p style="color:#aaa;">CÓDIGO DE SALA:</p>
+      <h1 id="room-code" style="color:#ffd700; font-size:3rem; letter-spacing:5px; margin: 10px 0;">...</h1>
     </div>
   </div>
 
-  <div style="margin: 20px 0; opacity: 0.5;">- O -</div>
+  <div style="color: #666;">- O -</div>
 
   <div class="setup-box">
-    <h3>📱 ¿ERES EL CONTROL?</h3>
-    <input type="text" id="input-code" placeholder="CÓDIGO DE TV" maxlength="4">
-    <button class="btn" style="background: linear-gradient(to right, #11998e, #38ef7d); width:100%; margin-top:10px;" onclick="iniciarComoHost()">
-      Conectar al TV
+    <h3>📱 MODO CONTROL</h3>
+    <input type="text" id="input-code" placeholder="CÓDIGO" maxlength="4">
+    <button class="btn" style="background: linear-gradient(to right, #11998e, #38ef7d); width:100%; margin-top:15px;" onclick="iniciarComoHost()">
+      Conectar
     </button>
   </div>
 </div>
@@ -137,48 +155,50 @@
   <div id="cartaActual"></div>
 </div>
 
-<div id="historial-tv">
-  </div>
+<div id="historial-tv"></div>
 
 <div class="bottom-panel">
   <div class="status-bar">
-    <span>🃏 <span id="cartasContadas">0</span>/54</span>
-    <select id="intervalo" onchange="actualizarIntervalo()" style="background:#333; color:white; border:none; border-radius:4px;">
-      <option value="2000">2s</option>
-      <option value="3000">3s</option>
-      <option value="4000" selected>4s</option>
-      <option value="5000">5s</option>
-      <option value="6000">6s</option>
-    </select>
+    <div class="counters">
+      <span>🃏 <span id="cartasContadas">0</span>/54</span>
+    </div>
+    <div class="speed-control">
+      <select id="intervalo" onchange="actualizarIntervalo()">
+        <option value="2000">🚀 Rápido (2s)</option>
+        <option value="3000">🐇 Normal (3s)</option>
+        <option value="4000" selected>🐢 Tranqui (4s)</option>
+        <option value="5000">🐌 Lento (5s)</option>
+        <option value="6000">☕ Muy Lento (6s)</option>
+      </select>
+    </div>
   </div>
+
   <div class="controls">
-    <button class="btn" style="background:#3f51b5" onclick="barajear()">Barajear</button>
-    <button class="btn" style="background:#009688" onclick="iniciarJuego()">Iniciar</button>
-    <button class="btn btn-full" style="background:linear-gradient(to right, #ff416c, #ff4b2b)" onclick="mostrarSiguiente()">⏭️ SIGUIENTE</button>
-    <button class="btn btn-full" style="background:#444" onclick="detenerJuego()">✋ DETENER</button>
+    <button class="btn btn-shuffle" onclick="barajear()">🎲 Barajear</button>
+    <button class="btn btn-start" onclick="iniciarJuego()">🔔 Iniciar</button>
+    <button class="btn btn-next btn-large" onclick="mostrarSiguiente()">⏭️ Siguiente Carta</button>
+    <button class="btn btn-stop btn-large" onclick="detenerJuego()">✋ Detener Juego</button>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-/* --- LÓGICA DE CONEXIÓN (PEERJS) --- */
+/* --- LÓGICA DE CONEXIÓN P2P (PEERJS) --- */
 let peer = null;
 let conn = null;
 let isTV = false;
 
-// Generar código aleatorio de 4 letras
 function generarID() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let result = "";
   for(let i=0; i<4; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
-  return "LOTERIA-" + result; // Prefijo único
+  return "LOTERIA-" + result;
 }
 
-// 1. MODO TV
+// INICIAR COMO TV
 function iniciarComoTV() {
   const myID = generarID();
-  // Mostramos el código limpio (sin el prefijo LOTERIA-)
   const displayCode = myID.split('-')[1];
   
   document.getElementById('tv-code-display').style.display = 'block';
@@ -186,104 +206,94 @@ function iniciarComoTV() {
   
   peer = new Peer(myID);
   
-  peer.on('open', (id) => {
-    console.log('TV lista con ID:', id);
-  });
-
+  peer.on('open', (id) => console.log('TV Lista:', id));
   peer.on('connection', (connection) => {
     conn = connection;
-    // Cuando el celular se conecta
     conn.on('open', () => {
-      document.getElementById('setup-screen').style.display = 'none'; // Quitar pantalla de carga
-      document.body.classList.add('tv-mode'); // Activar modo TV
+      document.getElementById('setup-screen').style.display = 'none';
+      document.body.classList.add('tv-mode');
     });
-    
-    // Escuchar datos del celular
-    conn.on('data', (data) => {
-      manejarDatosTV(data);
-    });
+    conn.on('data', (data) => manejarDatosTV(data));
   });
-  
   isTV = true;
 }
 
-// 2. MODO CELULAR (HOST)
+// INICIAR COMO CONTROL
 function iniciarComoHost() {
   const codeInput = document.getElementById('input-code').value.toUpperCase().trim();
-  if(codeInput.length < 4) return alert("Ingresa el código de 4 caracteres");
+  if(codeInput.length < 4) return alert("Ingresa el código de 4 letras");
   
   const targetID = "LOTERIA-" + codeInput;
-  peer = new Peer(); // ID automático para el host
+  peer = new Peer();
   
   peer.on('open', (id) => {
     conn = peer.connect(targetID);
-    
     conn.on('open', () => {
       document.getElementById('setup-screen').style.display = 'none';
-      alert("¡Conectado a la TV!");
-      barajear(); // Barajar automáticamente al conectar
+      barajear(); // Resetear al entrar
     });
-
-    conn.on('error', (err) => alert("Error de conexión: " + err));
+    conn.on('error', (err) => alert("Error: No se encuentra la TV"));
   });
 }
 
-// MANEJAR DATOS EN LA TV
 function manejarDatosTV(data) {
-  if (data.accion === 'mostrar') {
-    renderizarCartaTV(data.numero);
-  } else if (data.accion === 'barajear') {
-    limpiarTV();
-    reproducirSonido("barajar.mp3");
-  } else if (data.accion === 'loteria') {
-    mostrarLoteriaTV();
-  }
+  if (data.accion === 'mostrar') renderizarCartaTV(data.numero);
+  else if (data.accion === 'barajear') { limpiarTV(); reproducirSonido("barajar.mp3"); }
+  else if (data.accion === 'loteria') mostrarLoteriaTV();
 }
 
-/* --- LÓGICA DEL JUEGO --- */
+/* --- LÓGICA DE JUEGO --- */
 let barajas = Array.from({ length: 54 }, (_, i) => i + 1);
 let mezcladas = [];
 let index = 0;
 let intervalo = null;
 let tiempo = 4000;
 
+function actualizarIntervalo() {
+  tiempo = parseInt(document.getElementById("intervalo").value);
+  if(intervalo) { clearInterval(intervalo); intervalo = setInterval(mostrarSiguiente, tiempo); }
+}
+
 function reproducirSonido(nombreArchivo) {
-  // Reproducir en ambos dispositivos
   new Audio(nombreArchivo).play().catch(e => {});
 }
 
 function barajear() {
-  if(isTV) return; // TV no controla
+  if(isTV) return;
   mezcladas = [...barajas].sort(() => Math.random() - 0.5);
   index = 0;
   
-  // Limpiar UI Host
   limpiarHost();
-  
-  // Mandar señal a TV
   if(conn) conn.send({ accion: 'barajear' });
   
   reproducirSonido("barajar.mp3");
-  actualizarContador(0);
+  document.getElementById("cartasContadas").textContent = "0";
 }
 
 function limpiarHost() {
   document.getElementById("cartaActual").innerHTML = "";
   document.getElementById("historial").innerHTML = "";
   document.getElementById("loteriaTexto").style.display = "none";
+  detenerJuegoSilencioso();
 }
 
 function limpiarTV() {
   document.getElementById("cartaActual").innerHTML = "";
-  document.getElementById("historial-tv").innerHTML = ""; // Limpiar historial TV
+  document.getElementById("historial-tv").innerHTML = "";
   document.getElementById("loteriaTexto").style.display = "none";
+}
+
+function detenerJuegoSilencioso() {
+  clearInterval(intervalo);
+  intervalo = null;
 }
 
 function iniciarJuego() {
   if (!mezcladas.length) barajear();
+  if (intervalo) return;
+  
   reproducirSonido("campana.mp3");
   reproducirSonido("corre.mp3");
-  if(intervalo) clearInterval(intervalo);
   intervalo = setInterval(mostrarSiguiente, tiempo);
 }
 
@@ -292,13 +302,10 @@ function mostrarSiguiente() {
     const numero = mezcladas[index];
     index++;
     
-    // 1. Mostrar en Celular
     renderizarCartaHost(numero);
-    
-    // 2. Mandar a TV
     if(conn) conn.send({ accion: 'mostrar', numero: numero });
     
-    actualizarContador(index);
+    document.getElementById("cartasContadas").textContent = index;
   } else {
     detenerJuego();
   }
@@ -306,20 +313,12 @@ function mostrarSiguiente() {
 
 function detenerJuego() {
   clearInterval(intervalo);
+  intervalo = null;
   mostrarLoteriaHost();
   if(conn) conn.send({ accion: 'loteria' });
 }
 
-function actualizarIntervalo() {
-  tiempo = parseInt(document.getElementById("intervalo").value);
-  if(intervalo) { clearInterval(intervalo); intervalo = setInterval(mostrarSiguiente, tiempo); }
-}
-
-function actualizarContador(n) {
-  document.getElementById("cartasContadas").textContent = n;
-}
-
-// RENDERIZADO CELULAR
+// RENDER CONTROL
 function renderizarCartaHost(numero) {
   const nombre = String(numero).padStart(2, '0');
   const imagen = `img/${nombre}.png`;
@@ -327,16 +326,15 @@ function renderizarCartaHost(numero) {
   
   document.getElementById("cartaActual").innerHTML = `<img src="${imagen}">`;
   
-  // Historial Celular
   const hist = document.getElementById("historial");
   const imgHist = document.createElement('img');
   imgHist.src = imagen;
-  hist.prepend(imgHist);
+  hist.prepend(imgHist); // Nueva a la izquierda
   
   reproducirSonido(audio);
 }
 
-// RENDERIZADO TV
+// RENDER TV
 function renderizarCartaTV(numero) {
   const nombre = String(numero).padStart(2, '0');
   const imagen = `img/${nombre}.png`;
@@ -344,16 +342,14 @@ function renderizarCartaTV(numero) {
   
   document.getElementById("cartaActual").innerHTML = `<img src="${imagen}">`;
   
-  // HISTORIAL EN TV (AQUI ESTÁ LO QUE PEDISTE)
+  // Historial TV (NUEVA A LA IZQUIERDA)
   const histTV = document.getElementById("historial-tv");
   const imgHist = document.createElement('img');
   imgHist.src = imagen;
-  // Usamos prepend para que la nueva salga a la izquierda (principio)
   histTV.prepend(imgHist);
   
-  // Limitar historial TV a ultimas 10 para que no sature memoria visual si quieres
-  if(histTV.children.length > 10) histTV.removeChild(histTV.lastChild);
-
+  if(histTV.children.length > 10) histTV.removeChild(histTV.lastChild); // Limitar a 10
+  
   reproducirSonido(audio);
 }
 
@@ -368,7 +364,6 @@ function mostrarLoteriaTV() {
   document.getElementById("loteriaTexto").style.display = "block";
   confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
 }
-
 </script>
 
 </body>
