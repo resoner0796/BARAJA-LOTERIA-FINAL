@@ -12,10 +12,9 @@
   <style>
     :root {
       --primary-gradient: linear-gradient(135deg, #ff4b1f 0%, #ff9068 100%);
-      --secondary-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-      --glass-bg: rgba(0, 0, 0, 0.85);
-      --glass-border: 1px solid rgba(255, 255, 255, 0.15);
-      --gold-glow: 0 0 25px rgba(255, 215, 0, 0.6);
+      --glass-bg: rgba(20, 20, 20, 0.95);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+      --gold-glow: 0 0 25px rgba(255, 215, 0, 0.5);
     }
 
     body {
@@ -24,10 +23,9 @@
       background: url('fondo.jpg') no-repeat center center fixed;
       background-size: cover;
       color: #fff;
-      min-height: 100vh; /* Permite crecer si es necesario */
+      height: 100vh;
       width: 100vw;
-      overflow-x: hidden; /* Solo ocultamos el scroll horizontal */
-      overflow-y: auto;   /* Habilitamos scroll vertical */
+      overflow-y: auto; /* Scroll permitido */
       display: flex;
       flex-direction: column;
     }
@@ -43,146 +41,145 @@
     .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #ffcc00; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* --- LAYOUT PRINCIPAL --- */
-    
+    /* HEADER */
     header {
       flex: 0 0 auto;
-      padding: 15px 10px;
-      background: rgba(0,0,0,0.4);
+      padding: 10px;
+      background: rgba(0,0,0,0.5);
       backdrop-filter: blur(5px);
       border-bottom: 1px solid rgba(255,255,255,0.1);
       text-align: center;
     }
 
-    /* TÍTULO REDISEÑADO (MODERNO) */
     h1 {
       font-family: 'Poppins', sans-serif;
-      font-weight: 800; /* Extra Bold */
-      font-size: 2rem;
-      margin: 0 0 10px 0;
+      font-weight: 800;
+      font-size: 1.8rem;
+      margin: 5px 0 10px 0;
       text-transform: uppercase;
-      letter-spacing: 3px;
-      background: linear-gradient(to right, #ffffff, #e0e0e0);
+      letter-spacing: 2px;
+      background: linear-gradient(to right, #ffffff, #dcdcdc);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.8));
     }
 
     #historial {
       display: flex;
       flex-direction: row;
-      flex-wrap: nowrap;
       overflow-x: auto;
       gap: 8px;
-      padding: 5px 10px;
-      min-height: 60px;
+      padding: 5px 0;
+      height: 70px; /* Altura fija para evitar saltos */
       align-items: center;
-      justify-content: flex-start; /* Alineado a la izquierda para ir viendo flujo */
+      justify-content: flex-start;
       scrollbar-width: thin;
       scrollbar-color: #ff4b1f transparent;
     }
     
-    #historial::-webkit-scrollbar { height: 4px; }
-    #historial::-webkit-scrollbar-thumb { background: #ff4b1f; border-radius: 10px; }
-
     #historial img {
-      width: 50px;
-      border-radius: 6px;
+      height: 60px;
+      width: auto;
+      border-radius: 5px;
       border: 1px solid rgba(255,255,255,0.4);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-      flex-shrink: 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.5);
       animation: fadeIn 0.5s ease;
     }
 
-    /* SECCIÓN CENTRAL (CARTA) */
+    /* MAIN */
     main {
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 20px 0; /* Espacio arriba y abajo */
+      position: relative;
+      width: 100%;
     }
 
+    /* CORRECCIÓN DEL SALTO: Altura mínima reservada para la carta */
     #cartaActual {
       position: relative;
       z-index: 10;
-      margin-bottom: 10px;
-    }
-
-    #cartaActual img {
-      width: 260px;
-      max-width: 85vw;
-      border: 6px solid #ffd700;
-      border-radius: 20px;
-      box-shadow: var(--gold-glow), 0 20px 50px rgba(0,0,0,0.7);
-      animation: dealCard 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    @keyframes dealCard {
-      0% { opacity: 0; transform: translateY(-80px) scale(0.5) rotate(-10deg); }
-      100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
-    }
-    @keyframes fadeIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-
-    #contador {
-      background: rgba(0,0,0,0.6);
-      padding: 8px 20px;
-      border-radius: 30px;
-      font-size: 0.9rem;
-      display: flex;
-      gap: 20px;
-      border: 1px solid rgba(255,255,255,0.1);
-      margin-top: 10px;
-    }
-    #contador span { color: #ffd700; font-weight: 700; }
-
-    /* --- BOTTOM PANEL REORGANIZADO --- */
-    .bottom-panel {
-      flex: 0 0 auto;
-      background: var(--glass-bg);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
-      border-top: var(--glass-border);
-      padding: 20px;
-      border-radius: 25px 25px 0 0;
-      box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
-    }
-
-    /* SELECTOR DE VELOCIDAD (AHORA ARRIBA DE LOS BOTONES) */
-    .speed-control-container {
+      width: 100%;
+      height: 350px; /* ALTO FIJO IMPORTANTE */
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-bottom: 15px; /* Separación de los botones */
-      background: rgba(255, 255, 255, 0.1);
-      padding: 10px;
+    }
+
+    #cartaActual img {
+      height: 320px;
+      width: auto;
+      max-width: 90%;
+      border: 6px solid #ffd700;
+      border-radius: 18px;
+      box-shadow: var(--gold-glow), 0 20px 40px rgba(0,0,0,0.6);
+      animation: dealCard 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes dealCard {
+      0% { opacity: 0; transform: scale(0.5) translateY(-50px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+
+    /* PANEL INFERIOR (CONTROLES Y STATUS) */
+    .bottom-panel {
+      flex: 0 0 auto;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: var(--glass-border);
+      padding: 15px 20px 30px 20px; /* Padding extra abajo para móviles */
+      border-radius: 25px 25px 0 0;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.7);
+    }
+
+    /* BARRA DE ESTADO (VELOCIDAD + CONTADORES) */
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.05);
+      padding: 10px 15px;
       border-radius: 12px;
-      width: fit-content;
-      margin-left: auto;
-      margin-right: auto;
+      margin-bottom: 15px;
+      border: 1px solid rgba(255,255,255,0.05);
     }
 
-    .speed-control-container label {
-      margin-right: 10px;
+    .counters {
+      display: flex;
+      gap: 15px;
+      font-size: 0.9rem;
       font-weight: 600;
-      font-size: 0.9rem;
-      color: #ddd;
     }
 
-    select {
-      background: #222;
-      border: 1px solid #555;
+    .counters div {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .counters span {
+      color: #ffd700;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .speed-control select {
+      background: #333;
       color: white;
-      padding: 8px 15px;
-      border-radius: 8px;
+      border: 1px solid #555;
+      padding: 6px 12px;
+      border-radius: 6px;
       font-family: 'Poppins', sans-serif;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       outline: none;
-      cursor: pointer;
     }
 
-    /* GRID DE BOTONES */
+    /* BOTONES */
     #controls {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -192,51 +189,44 @@
     .btn-large { grid-column: span 2; }
 
     .btn {
-      padding: 16px;
+      padding: 14px;
       font-family: 'Poppins', sans-serif;
       font-weight: 700;
       font-size: 1rem;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       color: white;
       cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 8px;
-      transition: transform 0.1s, filter 0.2s;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      transition: active 0.1s;
     }
+    
+    .btn:active { transform: scale(0.98); }
 
-    .btn:active { transform: translateY(3px); }
-
-    .btn-shuffle { background: #5c6bc0; box-shadow: 0 4px 0 #3949ab; }
-    .btn-start { background: #26a69a; box-shadow: 0 4px 0 #00897b; }
+    .btn-shuffle { background: #3f51b5; box-shadow: 0 4px 0 #283593; }
+    .btn-start { background: #009688; box-shadow: 0 4px 0 #00695c; }
     .btn-next { 
-      background: linear-gradient(to right, #ff512f, #dd2476); 
-      box-shadow: 0 4px 0 #a30036;
+      background: linear-gradient(to right, #ff416c, #ff4b2b); 
+      box-shadow: 0 4px 0 #b71c1c;
       font-size: 1.1rem;
     }
-    .btn-stop { background: #ef5350; box-shadow: 0 4px 0 #c62828; }
+    .btn-stop { background: #444; box-shadow: 0 4px 0 #222; border: 1px solid #666; }
 
     #loteriaTexto {
       position: fixed; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       font-family: 'Poppins', sans-serif; 
-      font-weight: 800;
-      font-size: 4rem;
+      font-weight: 900;
+      font-size: 4.5rem;
       background: linear-gradient(to bottom, #ffd700, #ff8c00);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       z-index: 2000; display: none;
-      text-shadow: 0 10px 20px rgba(0,0,0,0.5);
-    }
-
-    /* Ajuste para pantallas pequeñas (scroll) */
-    @media (max-height: 700px) {
-      main { padding: 10px 0; }
-      #cartaActual img { width: 200px; }
-      h1 { font-size: 1.5rem; }
+      text-shadow: 0 10px 30px rgba(0,0,0,0.8);
     }
   </style>
 </head>
@@ -260,22 +250,25 @@
   
   <div id="cartaActual">
     </div>
-
-  <div id="contador">
-    <div>🃏 <span id="cartasContadas">0</span>/54</div>
-    <div>🏆 <span id="partidasJugadas">0</span></div>
-  </div>
 </main>
 
 <div class="bottom-panel">
-  <div class="speed-control-container">
-    <label for="intervalo">⏱️ Velocidad de carta:</label>
-    <select id="intervalo" onchange="actualizarIntervalo()">
-      <option value="2000">🚀 Rápido (2s)</option>
-      <option value="3000">🐇 Normal (3s)</option>
-      <option value="4000" selected>🐢 Tranqui (4s)</option>
-      <option value="5000">🐌 Lento (5s)</option>
-      <option value="6000">☕ Muy Lento (6s)</option> </select>
+  
+  <div class="status-bar">
+    <div class="counters">
+      <div>🃏 <span id="cartasContadas">0</span>/54</div>
+      <div>🏆 <span id="partidasJugadas">0</span></div>
+    </div>
+    
+    <div class="speed-control">
+      <select id="intervalo" onchange="actualizarIntervalo()">
+        <option value="2000">🚀 2s</option>
+        <option value="3000">🐇 3s</option>
+        <option value="4000" selected>🐢 4s</option>
+        <option value="5000">🐌 5s</option>
+        <option value="6000">☕ 6s</option>
+      </select>
+    </div>
   </div>
 
   <div id="controls">
@@ -323,13 +316,17 @@ function actualizarContadores() {
 
 function reproducirSonido(nombreArchivo) {
   const audio = new Audio(nombreArchivo);
-  audio.play().catch(e => console.log("Audio interact needed"));
+  audio.play().catch(e => console.log("Audio requires interaction"));
 }
 
 function barajear() {
   mezcladas = [...barajas].sort(() => Math.random() - 0.5);
   index = 0;
-  document.getElementById("cartaActual").innerHTML = "";
+  // NO borramos innerHTML del contenedor completo para evitar colapsos
+  // Solo borramos la imagen si existe
+  const cartaContainer = document.getElementById("cartaActual");
+  cartaContainer.innerHTML = "";
+  
   document.getElementById("historial").innerHTML = "";
   document.getElementById("loteriaTexto").style.display = "none";
   detenerJuegoSilencioso();
@@ -354,6 +351,9 @@ function iniciarJuego() {
 }
 
 function mostrarSiguiente() {
+  // Prevenir comportamiento default del boton por si acaso
+  if(event) event.preventDefault();
+
   if (index < mezcladas.length) {
     mostrarCarta(mezcladas[index]);
     index++;
@@ -385,13 +385,14 @@ function mostrarCarta(numero) {
   const historial = document.getElementById("historial");
   const actual = document.getElementById("cartaActual");
 
+  // Limpiamos y agregamos
   actual.innerHTML = ''; 
   actual.appendChild(imgElement);
 
-  // Agregar al historial (al inicio para ver las recientes a la izquierda)
+  // Agregar al historial (prepend para ver la nueva al principio izquierda)
   const historyImg = document.createElement('img');
   historyImg.src = imagen;
-  historial.prepend(historyImg); // Cambiado a PREPEND para ver la última carta luego luego
+  historial.prepend(historyImg); 
 
   reproducirSonido(audio);
 }
